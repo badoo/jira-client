@@ -1,0 +1,194 @@
+#!/usr/bin/env php
+<?php
+/**
+ * @package \Badoo\Jira\CLI
+ * @author Denis Korenevskiy <denkoren@corp.badoo.com>
+ */
+
+require __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+
+$Climate = new \League\CLImate\CLImate();
+
+$Climate->arguments->add(
+    [
+        'help' => [
+            'prefix'        => 'h',
+            'longPrefix'    => 'help',
+            'description'   => 'show help message and exit.',
+            'noValue'       => true,
+        ],
+
+        'config' => [
+            'prefix'        => 'c',
+            'longPrefix'    => 'config',
+            'description'   => 'use alternative configuration file path.',
+        ],
+
+        'log-level' => [
+            'prefix'        => 'l',
+            'longPrefix'    => 'log-level',
+            'description'   => 'change max log level. Use PSR-3 log level names here',
+        ],
+
+        // JIRA client configuration
+        'jira-url' => [
+            'longPrefix'    => 'jira-url',
+            'description'   => 'use API of this JIRA instance (e.g. https://jira.localhost/).',
+        ],
+        'timeout' => [
+            'longPrefix'    => 'timeout',
+            'description'   => 'API request timeout in seconds. Defaults to 60',
+            'castTo'        => 'int',
+        ],
+        'user' => [
+            'prefix'        => 'U',
+            'longPrefix'    => 'user',
+            'description'   => 'auth in JIRA API with this user',
+        ],
+        'password' => [
+            'prefix'        => 'P',
+            'longPrefix'    => 'password',
+            'description'   => 'auth in JIRA API with this password or API token.',
+        ],
+        'credentials-file' => [
+            'longPrefix'    => 'credentials-file',
+            'description'   => 'read <user>:<password> pair from this file',
+        ],
+
+        // Find-field configuration
+        'ignore-case' => [
+            'prefix'        => 'i',
+            'longPrefix'    => 'ignore-case',
+            'description'   => 'run case insensitive search.',
+            'noValue'       => true,
+        ],
+        'pretty' => [
+            'prefix'        => 'p',
+            'longPrefix'    => 'pretty',
+            'description'   => 'output pretty JSON (human-readable)',
+            'noValue'       => true,
+        ],
+        'field-name' => [
+            'description'   => 'name of field to search for.',
+        ]
+    ]
+);
+
+$Climate->description('Find JIRA custom field imformation using API');
+
+// Initialize lgger as soon as possible
+$Logger = new \Badoo\Jira\CLI\ClimateLogger($Climate);
+
+try {
+    $Climate->arguments->parse();
+} catch (\League\CLImate\Exceptions\InvalidArgumentException $e) {
+    $Logger->error($e->getMessage());
+    die(1);
+}
+
+// Change logging level first
+$log_level = $Climate->arguments->get('log-level');
+if (!empty($log_level)) {
+    $Logger->setLevelThreshold($log_level);
+}
+
+if ($Climate->arguments->defined('help')) {
+    $Climate->usage();
+    die(0);
+}
+
+$field_name = $Climate->arguments->get('field-name');
+if (empty($field_name)) {
+    $Logger->error("Field name to look for is required");
+    $Climate->to('error')->br();
+    $Climate->usage();
+    die(1);
+}
+
+$config_path = $Climate->arguments->get('config');
+if (empty($config_path)) {
+    $config_path = \Badoo\Jira\CLI\Configuration::DEFAULT_CONFIG_FILE;
+}
+
+$Config = new \Badoo\Jira\CLI\Configuration();
+if (\Badoo\Jira\Helpers\Files::exists($config_path)) {
+    $Config->load($config_path);
+} else {
+    $msg = "Config file {$config_path} not found.";
+    if ($Climate->arguments->defined('config')) {
+        $Logger->error($msg);
+        die(1);
+    }
+
+    $Logger->warning($msg);
+}
+
+// Override configuration options with ones from CLI arguments
+$Logger->debug('Overriding configuration with command line options...');
+
+if (!empty($log_level)) {
+    $Config->setLogLevel($log_level);
+}
+
+$jira_url = $Climate->arguments->get('jira-url');
+if (!empty($jira_url)) {
+    $Config->setJiraUrl($jira_url);
+}
+
+$timeout = $Climate->arguments->get('timeout');
+if (!empty($timeout)) {
+    $Config->setJiraTimeout($timeout);
+}
+
+$jira_cred_file = $Climate->arguments->get('credentials-file');
+if (!empty($jira_cred_file)) {
+    $Config->setJiraCredentialsFile($jira_cred_file);
+}
+
+$jira_user = $Climate->arguments->get('user');
+if (!empty($jira_user)) {
+    $Config->setJiraUser($jira_user);
+}
+
+$jira_password = $Climate->arguments->get('password');
+if (!empty($jira_password)) {
+    $Config->setJiraPassword($jira_password);
+}
+
+// Actual script
+
+$Jira = $Config->getJiraClient();
+
+if (strpos($field_name, 'customfield_') === 0) {
+    $FieldInfo = $Jira->field()->get($field_name);
+    $fields = [$FieldInfo];
+} else {
+    $fields = $Jira->field()->search($field_name, !$Climate->arguments->defined('ignore-case'));
+}
+
+$load_options_types = [
+    'option',
+    'array',
+];
+
+$load_option_items = [
+    '',
+    'option'
+];
+
+foreach ($fields as $FieldInfo) {
+    $type = $FieldInfo->schema->type;
+    $item_type = $FieldInfo->schema->items ?? '';
+    $is_custom = isset($FieldInfo->schema->custom);
+
+    if ($is_custom && in_array($type, $load_options_types) && in_array($item_type, $load_option_items)) {
+        $FieldInfo->options = $Jira->jql()->getFieldSuggestions($FieldInfo->name);
+    }
+}
+
+$opts = 0;
+if ($Climate->arguments->get('pretty')) {
+    $opts = $opts | JSON_PRETTY_PRINT;
+}
+
+echo json_encode($fields, $opts) . PHP_EOL;

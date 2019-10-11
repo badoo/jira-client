@@ -1,0 +1,34 @@
+{
+  "com.atlassian.jira.plugin.system.customfieldtypes:textfield": {
+    "name": "TextField"
+  },
+  "com.atlassian.jira.plugin.system.customfieldtypes:textarea": {
+    "name": "TextField"
+  },
+  "com.atlassian.jira.plugin.system.customfieldtypes:float": {
+    "name": "NumberField"
+  },
+  "com.atlassian.jira.plugin.system.customfieldtypes:userpicker": {
+    "name": "SingleUserField"
+  },
+  "com.atlassian.jira.plugin.system.customfieldtypes:multiuserpicker": {
+    "name": "UserField",
+    "load-options": true
+  },
+  "com.atlassian.jira.plugin.system.customfieldtypes:select": {
+    "name": "SingleSelectField",
+    "load-options": true
+  },
+  "com.atlassian.jira.plugin.system.customfieldtypes:radiobuttons": {
+    "name": "RadioField",
+    "load-options": true
+  },
+  "com.atlassian.jira.plugin.system.customfieldtypes:multiselect": {
+    "name": "SelectField",
+    "load-options": true
+  },
+  "com.atlassian.jira.plugin.system.customfieldtypes:multicheckboxes": {
+    "name": "CheckboxField",
+    "load-options": true
+  }
+}

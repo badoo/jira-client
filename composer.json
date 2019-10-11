@@ -1,0 +1,43 @@
+{
+    "name": "badoo/jira-client",
+    "type": "library",
+    "description": "Jira REST API client with comfortable wrappers for most commonly used API instances like issues, custom fields, components and so on",
+    "minimum-stability": "stable",
+    "license": "GPLv3",
+    "homepage": "https://badoo.com/",
+    "authors": [
+        {
+            "name": "Badoo Development"
+        },
+        {
+            "name": "Korenevskiy Denis",
+            "email": "denkoren@corp.badoo.com",
+            "role": "Developer"
+        }
+    ],
+    "bin": [
+        "bin/find-field",
+        "bin/generate"
+    ],
+    "require": {
+        "php": ">=7.2",
+        "ext-json": "*",
+        "ext-curl": "*",
+        "psr/log": "^1.0",
+        "symfony/yaml": "^4.2",
+        "league/climate": "^3.5"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.2",
+        "friendsofphp/php-cs-fixer": "^2.15"
+    },
+    "autoload": {
+        "psr-4": {
+            "Badoo\\Jira\\": "src/",
+            "Badoo\\Jira\\UTests\\": "tests/"
+        }
+    },
+    "config": {
+        "preferred-install": "source"
+    }
+}

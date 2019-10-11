@@ -1,0 +1,171 @@
+# Logging level for generator and CLI script loggers
+# Use PSR-3 compatible logging levels:
+#     'emergency'
+#     'alert'
+#     'critical'
+#     'error'
+#     'warning'
+#     'notice'
+#     'info'
+#     'debug'
+#
+# Defaults to 'warning'
+#
+#log-level: 'warning'
+
+#
+# JIRA configuration section. Server URL, API auth user and password and request timeouts.
+# Things utilities must know to just work.
+#
+#JIRA:
+  # URL to your JIRA web interface root
+  #
+  # Defailts to https://jira.localhost/
+  #
+  #URL: 'https://jira.localhost/'
+
+  # Credentials file with text consisting of two fields separated with colon (':' symbol)
+  #   <user name>:<password>
+  # This file is read by CLI scripts to get JIRA user and password/token for interaction with API
+  #
+  # By default credentials file path is empty, script will not try to search for any files with creds.
+  #
+  #credentials-file: './jira-credentials'
+
+  # User name to use in JIRA API requests.
+  # This parameter has higher priority than data read from credentials file
+  #
+  # Defaults to 'automation' user
+  #
+  #user: 'automation'
+
+  # Password or API token to use in JIRA API requests.
+  # This parameter has higher priority than data read from credentials file
+  #
+  # Defaults to empty string
+  #
+  #password: 'very strong passsword'
+
+  # API requsts timeout in seconds. If JIRA does not responds to CLI script's request longer than this amount of
+  # seconds, scripts thinks JIRA is not available by the given URL
+  #
+  # Defaults to 60 seconds
+  #
+  #timeout: 60
+
+#
+# Generator config section. Controls the behaviuor of 'generate' command: what fields to skip, what additional templates
+# to use and so on.
+#
+#Generator:
+  # Target directory. All generated classes will be saved to files within this directory
+  #
+  # Defaults to './' (current working dir)
+  #
+  #target-directory: './'
+
+  # Generated map file. After each generation generator saves mappings of fields it treated and classes it generated.
+  # This allows handle field renames and keep changes within the same class for the same field even when field was
+  # renamed.
+  # It also allows to prevent generator from corrupting hacky files, that are about custom fields but were written by
+  # hand and should not be touched by generator.
+  #
+  # Defaults to '.generated-fields.map.json' within target directory
+  #
+  #map-file: ''
+
+  # Target namespace for generated classes. All classes for JIRA custom fields will be within this PHP namespace
+  #
+  # Defaults to '' (global namespace)
+  #
+  #target-namespace: ''
+
+  # Skip generation for this fields.
+  # Fields with IDs from this list will be skipped by generator, if field has 'true' associated value.
+  #
+  # This option has highest priority:
+  #     it overrides 'skip-types' option
+  #     it overrides 'skip-type-patterns' option
+  #
+  #   Example:
+  #     you have 2 fields: <field_ID_1>, <some field type> and <field_ID_2>, <some field type>.
+  #     if your 'skip-type' contains <some field type> record, both fields will be skipped.
+  #     if you set 'skip-fields' for <field_ID_1> to 'false', it field will not be skipped, while <field_ID_2> - will.
+  #
+  # We recommend you to write textual field names in the comment to each field ID, to ease field identification
+  # in the future
+  #
+  # By default this map is empty.
+  #
+  #skip-fields:
+    #<customfield_12345>: <true|false> # <human-readable field name here>
+    #<customfield_54321>: <true|false>
+    #<... other field IDs>: <true|false>
+
+  # Skip generation for this fields.
+  # Fields of types from this list will be skipped by generator, if field has 'true' associated value.
+  #
+  # This option has 'middle' priority:
+  #     it can be overriden by 'skip-fields' option.
+  #     it overrides 'skip-type-patterns' option.
+  #
+  # By default this map is empty.
+  #
+  #skip-types:
+    #<com.atlassian.jira.plugin...>: <true|false>
+    #<com.onresolve.jira.groovy...>: <true|false>
+    #<... other custom field type>: <true|false>
+
+  # Skip generation for this fields.
+  # Fields of types that match any of regexs in list will be skipped by generator, if field has 'true' associated value.
+  # This option has least possible priority
+  # This can be overriden by 'skip-fields' or 'skip-types' option.
+  #
+  # By default this map is empty.
+  #
+  #skip-type-patterns:
+    #<regex 1>: <true|false>
+    #<regex 2>: <true|false>
+
+  # Custom templates to load and bind to field IDs and types
+  # All custom templates are treated by \Badoo\Jira\CFGenerator\SimpleTemplate class. If you want more - you have to use
+  # \Badoo\Jira\CFGenerator\Generator class to configure generator manually and run it from your own PHP script.
+  #
+  # Generator API allows you to use any kind of template engine, you just need to implement simple ITemplate interface
+  #
+  #custom-templates:
+    # Template name. Any string, that will help you identify the template if the error appear during generation.
+    #
+    #<some template name>:
+      # Path to template file. Relative paths are treated as relative to config file location
+      #
+      #path: <path to template file>
+
+      # Ask template engine to load options for custom field before rendering.
+      # When your field type has limited range of allowed values, template engine can request JIRA API for possible
+      # suggestions for field values and pass them to the template. This is how Select Field works, for example.
+      # If your field type has unlimited range of values, set this parameter to 'false' because it saves a lot of time
+      # during generation.
+      #
+      #load-options: <true|false>
+
+      # List of fields that should be treated by this template
+      # Fields are identified by their IDs.
+      # Example:
+      #   fields:
+      #     - 'customfield_12345'
+      #     - 'customfield_10800'
+      #
+      #fields:
+
+      # List of field types that should be treated by this template
+      # You can get field type from custom field info from '/schema/custom' leaf.
+      # To get custom field info with CLI use bin/find-field sctipt
+      # Example:
+      #   types:
+      #     - 'com.atlassian.jira.plugin.system.customfieldtypes:importid'
+      #     - 'com.onresolve.jira.groovy.groovyrunner:hideable-textarea'
+      #
+      #types:
+
+    #<other template name>:

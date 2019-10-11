@@ -1,0 +1,294 @@
+#!/usr/bin/env php
+<?php
+/**
+ * @package REST
+ * @author Denis Korenevskiy <denkoren@corp.badoo.com>
+ */
+
+require __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+
+const EXIT_OK                       = 0;
+const EXIT_GENERATION_FAILED        = 1;
+const EXIT_FIELD_NOT_FOUND          = 2;
+const EXIT_CONFIG_ERROR             = 3;
+const EXIT_INVALID_CLI_OPTIONS      = 4;
+const EXIT_INTERRUPTED              = 5;
+
+function configureGenerator(\Badoo\Jira\CFGenerator\Generator $Generator, \Badoo\Jira\CLI\Configuration $Config, \Psr\Log\LoggerInterface $Logger) : bool
+{
+    $all_ok = true;
+
+    $Generator
+        ->setTargetDirectory($Config->getGeneratorTargetDirectory())
+        ->setGeneratedMapFile($Config->getGeneratorMapFile())
+        ->setTargetNamespace($Config->getGeneratorTargetNamespace());
+
+    foreach ($Config->getGeneratorCustomTemplates() as $template_name => $template_options) {
+        $path = $template_options['path'] ?? null;
+        if (!isset($path)) {
+            $Logger->error("Template '{$template_name}' has no path to template file.");
+            $all_ok = false;
+            continue;
+        }
+
+        $path = $Config->resolvePath($path);
+
+        $load_options = $template_options['load-options'] ?? false;
+        $fields       = $template_options['fields'] ?? [];
+        $types        = $template_options['types'] ?? [];
+
+        if (empty($fields) && empty($types)) {
+            $Logger->warning("Template '{$template_name}' is not bound to any of field or field type and is thus unreachable");
+            continue;
+        }
+
+        $Template = new \Badoo\Jira\CFGenerator\SimpleTemplate($template_name, $Generator->getJira());
+        $Template
+            ->setTemplatePath($path)
+            ->setLoadOptions($load_options);
+
+        foreach ($fields as $field_name) {
+            $Generator->mapFieldToTemplate($field_name, $Template);
+        }
+
+        foreach ($types as $type_name) {
+            $Generator->mapTypeToTemplate($type_name, $Template);
+        }
+    }
+
+    foreach ($Config->getGeneratorSkipFields() as $field_id => $skip) {
+        $Generator->skipField($field_id, $skip);
+    }
+
+    foreach ($Config->getGeneratorSkipTypes() as $field_type => $skip) {
+        $Generator->skipType($field_type, $skip);
+    }
+
+    foreach ($Config->getGeneratorSkipTypePatterns() as $pattern => $skip) {
+        $Generator->skipTypePattern($pattern, $skip);
+    }
+
+    return $all_ok;
+}
+
+function runSingleFieldGeneration(string $field, \Badoo\Jira\CFGenerator\Generator $Generator, \Psr\Log\LoggerInterface $Logger) : bool
+{
+    $Logger->info("Single field generation mode.");
+
+    if (strpos($field, 'customfield_') === 0) {
+        try {
+            $FieldInfo = $Generator->getJira()->field()->get($field);
+        } catch (\Badoo\Jira\REST\Exception $e) {
+            $Logger->critical($e->getMessage());
+            exit(EXIT_FIELD_NOT_FOUND);
+        }
+    } else {
+        $fields = $Generator->getJira()->field()->search($field);
+        if (count($fields) === 0) {
+            $Logger->critical("Field with name '{$field}' not found in JIRA. Can't generate class for it");
+            exit(EXIT_FIELD_NOT_FOUND);
+        }
+
+        if (count($fields) > 1) {
+            $Logger->critical("Found more than one field with name {$field}. Please use field ID to choose as single field between them");
+            foreach ($fields as $FieldInfo) {
+                $Logger->critical(print_r($FieldInfo, true));
+            }
+
+            exit(EXIT_FIELD_NOT_FOUND);
+        }
+
+        $FieldInfo = reset($fields);
+    }
+
+    // Forced field generation
+    return $Generator->generateField($FieldInfo);
+}
+
+$Climate = new \League\CLImate\CLImate();
+
+$Climate->arguments->add(
+    [
+        'help' => [
+            'prefix' => 'h',
+            'longPrefix' => 'help',
+            'description' => 'show help message and exit.',
+            'noValue' => true,
+        ],
+
+        'config' => [
+            'prefix' => 'c',
+            'longPrefix' => 'config',
+            'description' => 'use alternative configuration file path.',
+        ],
+
+        'log-level' => [
+            'prefix' => 'l',
+            'longPrefix' => 'log-level',
+            'description' => 'change max log level. Use PSR-3 log level names here',
+        ],
+
+        // JIRA client configuration
+        'jira-url' => [
+            'longPrefix' => 'jira-url',
+            'description' => 'use API of this JIRA instance (e.g. https://jira.localhost/).',
+        ],
+        'timeout' => [
+            'longPrefix' => 'timeout',
+            'description' => 'API request timeout in seconds. Defaults to 60',
+            'castTo' => 'int',
+        ],
+        'user' => [
+            'prefix' => 'u',
+            'longPrefix' => 'user',
+            'description' => 'auth in JIRA API with this user',
+        ],
+        'password' => [
+            'prefix' => 'p',
+            'longPrefix' => 'password',
+            'description' => 'auth in JIRA API with this password or API token.',
+        ],
+        'credentials-file' => [
+            'longPrefix' => 'credentials-file',
+            'description' => 'read <user>:<password> pair from this file',
+        ],
+
+        // Generator configuration
+        'target-dir' => [
+            'longPrefix' => 'target-dir',
+            'description' => 'Target directory. All generated classes will be saved there',
+        ],
+        'generated-map-file' => [
+            'longPrefix' => 'generated-map-file',
+            'description' => 'Path to generated map file, that contains metadata for previous generations. This file will be created after the first generation. You should commit it into version control with the generated classes',
+        ],
+        'namespace' => [
+            'longPrefix' => 'namespace',
+            'description' => 'Target namespace for generated classes.',
+        ],
+        'field-to-generate' => [
+            'description' => "Generate class for single field, identified by name of ID (e.g. 'Developer' or 'customfield_12345')"
+        ],
+    ]
+);
+
+$Climate->description('Find JIRA custom field imformation using API');
+
+// Initialize lgger as soon as possible
+$Logger = new \Badoo\Jira\CLI\ClimateLogger($Climate);
+
+try {
+    $Climate->arguments->parse();
+} catch (\League\CLImate\Exceptions\InvalidArgumentException $e) {
+    $Logger->error($e->getMessage());
+    exit(EXIT_INVALID_CLI_OPTIONS);
+}
+
+// Change logging level first
+$log_level = $Climate->arguments->get('log-level');
+if (!empty($log_level)) {
+    $Logger->setLevelThreshold($log_level);
+}
+
+if ($Climate->arguments->defined('help')) {
+    $Climate->usage();
+    exit(EXIT_OK);
+}
+
+$config_path = $Climate->arguments->get('config');
+if (empty($config_path)) {
+    $Logger->debug("Configuration file path is not specified in CLI options. Using default config name.");
+    $config_path = \Badoo\Jira\CLI\Configuration::DEFAULT_CONFIG_FILE;
+}
+
+$Config = new \Badoo\Jira\CLI\Configuration();
+if (\Badoo\Jira\Helpers\Files::exists($config_path)) {
+    $Logger->debug("Loading configuration file {$config_path}...");
+    $Config->load($config_path);
+} else {
+    $msg = "Config file {$config_path} not found.";
+    if ($Climate->arguments->defined('config')) {
+        $Logger->error($msg);
+        exit(EXIT_CONFIG_ERROR);
+    }
+
+    $Logger->warning($msg);
+}
+
+// Override configuration options with ones from CLI arguments
+$Logger->debug('Overriding configuration with command line options...');
+
+if (!empty($log_level)) {
+    $Config->setLogLevel($log_level);
+}
+$Logger->setLevelThreshold($Config->getLogLevel());
+
+$jira_url = $Climate->arguments->get('jira-url');
+if (!empty($jira_url)) {
+    $Config->setJiraUrl($jira_url);
+}
+
+$timeout = $Climate->arguments->get('timeout');
+if (!empty($timeout)) {
+    $Config->setJiraTimeout($timeout);
+}
+
+$jira_cred_file = $Climate->arguments->get('credentials-file');
+if (!empty($jira_cred_file)) {
+    $Config->setJiraCredentialsFile($jira_cred_file);
+}
+
+$jira_user = $Climate->arguments->get('user');
+if (!empty($jira_user)) {
+    $Config->setJiraUser($jira_user);
+}
+
+$jira_password = $Climate->arguments->get('password');
+if (!empty($jira_password)) {
+    $Config->setJiraPassword($jira_password);
+}
+
+$target_dir = $Climate->arguments->get('target-dir');
+if (!empty($target_dir)) {
+    $Config->setGeneratorTargetDirectory($target_dir);
+}
+
+$generated_map = $Climate->arguments->get('generated-map-file');
+if (!empty($generated_map)) {
+    $Config->setGeneratorMapFile($generated_map);
+}
+
+$target_namespace = $Climate->arguments->get('namespace');
+if (!empty($target_namespace)) {
+    $Config->setGeneratorTargetNamespace($target_namespace);
+}
+
+// Initializing Generator...
+$Logger->debug('Initializing Generator with JIRA client, custom templates and so on...');
+
+$Jira = $Config->getJiraClient();
+$Generator = new \Badoo\Jira\CFGenerator\Generator($Jira);
+$Generator->setLogger($Logger);
+
+$configuration_ok = configureGenerator($Generator, $Config, $Logger);
+$exit_code = $configuration_ok ? EXIT_OK : EXIT_CONFIG_ERROR;
+
+// Single field generation mode.
+$field = $Climate->arguments->get('field-to-generate');
+if (!empty($field)) {
+    $generation_ok = runSingleFieldGeneration($field, $Generator, $Logger);
+
+    $exit_code = $generation_ok ? $exit_code : EXIT_GENERATION_FAILED;
+    exit($exit_code);
+}
+
+// All fields generation mode
+$Input = $Climate->confirm("You are going to run generation for all JIRA custom fields in '{$Config->getJiraURL()}'. Are you sure?");
+
+if (!$Input->confirmed()) {
+    exit(EXIT_INTERRUPTED);
+}
+
+$generation_ok = $Generator->generateAll();
+$exit_code = $generation_ok ? $exit_code : EXIT_GENERATION_FAILED;
+exit($exit_code);

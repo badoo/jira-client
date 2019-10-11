@@ -1,0 +1,5 @@
+/vendor/
+/.idea/
+/test.php
+/.php_cs.cache
+/composer.phar

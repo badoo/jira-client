@@ -1,0 +1,376 @@
+# Badoo JIRA API Client scripts
+
+Here are several CLI scripts, based on Badoo JIRA API Client classes, designed to ease code generation process and
+JIRA instances information lookup.
+
+## First steps
+
+There are several scripts in a bin/ directory:
+* `find-field` is for searching fields information in JIRA API by field name.
+  It produces regular JSON output with all data on custom field, provided by API.
+  Mainly it is intended to be used as a helper when you configure the generator.
+* `generate` is for generating wrapper classes for custom fields.
+  It uses simple PHP templates to create files with PHP classes.
+
+All scripts can describe themselves. Use `-h` or `--help` options to ask them:
+
+```bash
+find-field --help
+find-field -h
+```
+
+All scripts use the same configuration file, so you can write everything only once and share the knowledge between
+all utilities within the bin/ directory. This will be true even for new scripts to appear in this dir in the future.
+
+The example configuration file with all options described is located at `examples/jira-generator-config.yaml`.
+It has lots of comments to give a clue on what is configurable and how.
+
+Before starting to read it, we recommend to follow this short guide to get used to instruments:
+
+### Connect to JIRA
+
+To interact with JIRA each script expects at least 3 configuration parameters: URL to JIRA, user and password.
+
+```bash
+find-field -jira-url='https://jira.example.com/' --user='<user>' --password='<password>' '<field name>'
+```
+
+Although you can specify all required configuration using CLI arguments, we recommend to use more convenient way.
+As noted above. scripts can use the same configuration file. If you tried the command above, you already noticed the message
+```text
+[WARNING]: Config file ./jira-generator-config.yaml not found.
+```
+
+That's exactly what we recommend to start from. Let's put required configuration there:
+
+```yaml
+JIRA:
+  URL: 'https://jira.example.com/'
+  user: 'user name'
+  password: 'very strong passsword or API token'
+```
+
+This minimal configuration enables scripts to interact with JIRA.
+
+By default all CLI scripts look for the config file `jira-generator-config.yaml` located in current directory.
+If you like an alternative config file path, you can provide scripts with it using `--config` option:
+
+```bash
+find-field --config='<your config file path>' '<field name>'
+```
+
+One more option of `find-field` utility we should note: `-p` makes it print formatted JSON, which is much easier to read:
+
+```json
+{
+    "customfield_10663": {
+        "id": "customfield_10600",
+        "name": "QA",
+        "custom": true,
+        "orderable": true,
+        "navigable": true,
+        "searchable": true,
+        "clauseNames": [
+            "cf[10600]",
+            "QA"
+        ],
+        "schema": {
+            "type": "option",
+            "custom": "com.atlassian.jira.plugin.system.customfieldtypes:select",
+            "customId": 10600
+        },
+        "options": [
+            {
+                "value": "NO",
+                "displayName": "NO"
+            },
+            {
+                "value": "YES",
+                "displayName": "YES"
+            }
+        ]
+    }
+}
+```
+
+more options could be discovered with
+```bash
+find-field -h
+```
+
+### Generate first field
+
+First, it is good to put the generated files into separate directory. Let's create one:
+
+```bash
+mkdir ./CustomFields
+```
+
+Also we need a field to work with.
+
+Out of the box generator supports only certain field types.
+As we not use complex configuration with custom templates in this guide, choose the field of one of types available in
+JIRA out of the box: User picker, Selec field (Single or multiple choice), Radio and so on.
+
+The name of the field displayed on page is enough to start generation process.
+Generator uses case-sensitive search for fields, check you spelled field name correct.
+
+After you chose the name, we are ready to make the first generated class for it.
+* to put this generated class into a special namespace use `--namespace` option,
+* to put file into directory - `--target-dir` one.
+
+```bash
+generate \
+    --config='<your config file>' \
+    --target-dir='./CustomFields' \
+    --namespace='\Example\CustomFields' \
+    '<name of field you chose>'
+```
+
+To avoid typing this in every command, save that options into configuration file:
+
+```yaml
+Generator:
+  target-directory: './CustomFields'
+  target-namespace: '\Example\CustomFields'
+```
+
+After first run generator created 2 files in CustomFields directory we used:
+* file with class for your field. The name of file is a textual field name transformed into CamelCase with all
+  forbidden symbols removed.
+* generated-fields.lock - file with the story of generation. It keeps track on fields in case of rename and prevents
+  script from changing existing files that were not generated by it. This means you can easily store generated custom
+  field classes with the ones you wrote by hand because they are too special to have a template for them.
+
+You should commit both of files to your repository, the same way as you do for `composer.lock` and other map fiels that
+help scripts to provide you with consistent results.
+
+That's it. Now you can use your freshly generated field:
+
+```php
+$Jira = new \Badoo\Jira\REST\Client();
+
+$Jira
+    ->setJiraUrl('your URL here')
+    ->setAuth(<user>, <password>);
+
+$YourCustomField = \Example\YourCustomField::forIssue('EXAMPLE-1', $Jira)
+$value = $YourCustomField->getValue();
+
+$YourCustomField->setValue($YourCustomFIeld::VALUE_YES)->save();
+```
+
+To generate classes for all custom fields supported by generator, use `generate` script without field name parameter.
+
+```bash
+generate --config='<your config file>'
+```
+
+### Commit changes to the repository
+
+As we already noted above, there is a special `generated-fields.lock` file right in the directory with generated classes.
+
+You should commit it with custom field classes.
+
+The absence of this file will make generator fail on next attempt, it
+will reject to generate all classes it worked with before, trying to protect them from himself.
+
+That's it!
+
+## HowTo's
+
+### Skip generation for fields or field types
+
+When generator has no template associated with field type, it has no idea what to do and skips the field with warning,
+to let you know it faced something it did not expect.
+
+To reduce such warnings and to tell generator 'this is not supported, I know it!', you can mark field as skipped.
+
+You also might want to skip some known fields generation to not get error messages about attempt to override
+non-generated file.
+
+There are 3 sections in config about skipping fields generation:
+* skip-fields
+* skip-types
+* skip-type-patterns
+
+The list is ordered by priority. The most prioritizes is skip-fields, the less - is skip-type-patterns
+
+Here is a short example of the skip configuration:
+```yaml
+Generator:
+  skip-fields:
+    customfield_12345: true
+    customfield_54321: false
+  skip-types:
+    'com.atlassian.jira.plugin.system.customfieldtypes:importid': true
+    'com.pyxis.greenhopper.jira:gh-epic-status': false
+  skip-patterns:
+    '/^com\.pyxis\.greenhopper\.jira:.*/': true
+```
+
+This config means the following:
+* skip generation for field customfield_12345
+* skip generation for fields of type 'com.atlassian.jira.plugin.system.customfieldtypes:importid' except field
+  customfield_54321 (let's think it has this type)
+* skip generation for fields of type that match regex pattern '/^com\.pyxis\.greenhopper\.jira:.*/', except fields of
+  type 'com.pyxis.greenhopper.jira:gh-epic-status'
+
+> NOTE: Skip settings work only when you perform full list generation. When you try to generate class for single field
+> providing field name to generator script, all skip rules are ignored.
+
+### Add new fields support
+
+It is possible to provide generator script with additional templates for special fields you have.
+
+#### Write a template
+
+Each template is a simple PHP-template, without any additional engines used.
+We tend to name template files with .tpl extension, but it's not required, as you give a path to the template
+file to the generator.
+
+Here is a content for one of templates provided out of the box:
+```php
+<?= "<?php\n" ?>
+/**
+ * This is a generated wrapper class for JIRA custom field '<?= $field_name ?>'
+ */
+<?php
+if (!empty($namespace)) {
+    echo "\nnamespace {$namespace};\n";
+}
+?>
+
+class <?= $class_name ?> extends \Badoo\Jira\CustomFields\SelectField
+{
+    const ID    = '<?= $field_id ?>';
+    const NAME  = '<?= $field_name ?>';
+
+    /* Available field values. */
+<?php foreach ($options as $option): ?>
+    const <?= $option['const_name'] ?> = '<?= $option['value'] ?>';
+<?php endforeach ?>
+
+    const VALUES = [
+<?php foreach ($options as $option): ?>
+        self::<?= $option['const_name'] ?>,
+<?php endforeach ?>
+    ];
+
+    public function getItemsList() : array
+    {
+        return static::VALUES;
+    }
+}
+```
+
+this template generates classes for Select Field (multiple choice).
+
+Note that `<?= "<?php\n" ?>` line at the top of template? It is important. It makes template to output a PHP open tag,
+so generated PHP class can be interpreted as PHP code when it will be loaded by autoload.
+
+Check the `src/CFGenerator/templates` directory for templates already implemented in generator.
+
+To make templates writing easier, we recommend to implement a custom field class by hand, shaping it to
+the appearence it should have. Then replace parts of the class with template substitutions.
+
+The substitutions are provided by \Badoo\Jira\CFGenerator\SimpleTemplate::render() method.
+Check it to understand what varables template has during the generation.
+
+#### Add a template to generator, attach it to fields of field types
+
+Here you have a new template, or at least a static file without any substitutions to just test generator sees it
+and provides a 'class' file for your field.
+
+Consider your file has location `./custom-templates/my-custom-template.tpl`
+
+To add template to generator we need to update a configuration file:
+
+```yaml
+Generator:
+  custom-templates:
+    MyCustomTemplate:
+      path: './custom-templates/my-custom-template.tpl'
+      load-options: false
+      types:
+        - 'com.atlassian.jira.plugin.myplugin:special-field-type'
+```
+
+Once template is bound to the field type (or particular field by its ID) you can generate your field class with
+generator:
+
+```bash
+generate 'your field name'
+```
+
+### Resolve field name conflicts
+
+JIRA allows to have several fields with the same name, with even case matching.
+PHP code doesn't do the same for classes.
+
+And that is not the only reson: we drop all forbidden symbols from field names and fields could differ in this
+symbols only:
+* ∑ Reopen
+* Reopen
+
+This two fields will get the same target class name, even they are clearly different in JIRA Web UI.
+
+When geenrator faces this situation, it reports a collision error message:
+```text
+[ERROR]: Field 'Platform' (customfield_11972) collided with 'Platform' (customfield_16265) in class 'Platform'
+```
+
+To resolve this, we need to redirect one of the fields into another class. Or even both, if you want.
+We already have mechanism for keeping fields within single file and class: `generated-fields.lock`.
+Let's patch it a bit!
+
+When the collision happens, you always already have a class for the first of the fields in conflict.
+Open `generated-fields.lock` file with your preferred editor. You will find there the following structure:
+
+```json
+{
+    "fields-classes": {
+      "some custom fields before the one we look...": {},
+      "customfield_11972": {
+          "class_name": "Platform",
+          "field_id": "customfield_11972",
+          "field_name": "Platform"
+      },
+      "other custom fields after...": {}
+    },
+    "classes-fields": {
+      "...": "..."
+    }
+}
+```
+
+* The 'fields-classes' map drives custom field with specific ID to the class it should have.
+* The 'classes-fields' map is that helper data, which allowed the Generator to catch the collision.
+  It's better not to touch it :)
+
+Let's add rule for our second conflicting custom field manually. We already have the name and ID of field from the
+log message, the only thing left is to shape them:
+```json
+{
+    "fields-classes": {
+      "some custom fields before the one we look...": {},
+      "customfield_11972": {
+          "class_name": "Platform",
+          "field_id": "customfield_11972",
+          "field_name": "Platform"
+      },
+      "customfield_16265": {
+          "class_name": "SecondSpecialPlatformClass",
+          "field_id": "customfield_16265",
+          "field_name": "Platform"
+      },
+      "other custom fields after...": {}
+    },
+    "classes-fields": {
+      "...": "..."
+    }
+}
+```
+
+Now the customfield_16265 (second 'Platform' field in our example) will create class `SecondSpecialPlatformClass`
+which will not conflict with the first.
