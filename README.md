@@ -81,7 +81,7 @@ $Issue->delete();
 # Documentation
 
 > NOTE: all examples in this documentation related to any interaction with JIRA consider you configured 'global'
-> client object.  Read [Configure the client](#create-new-issue) section above to know how to do that.
+> client object.  Read [Configure the client](#configure-the-client) section above to know how to do that.
 
 ## Client and ClientRaw
 
