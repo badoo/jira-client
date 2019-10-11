@@ -2,10 +2,10 @@
 This is Badoo JIRA REST Client. It contains a bunch of wrapper classes for most common API objects:
 Issues, Components and so on.
 
-This make code easier to write because of autocompletion your IDE will provide you.
+This makes code easier to write because of autocompletion your IDE will provide you.
 
 You can also generate lots of classes for custom fields to get the documentation for your own JIRA installation
-right in PHP code and get all the benefits of IDE autocompletion.
+right in PHP code.
 
 # Quick start
 
@@ -81,7 +81,9 @@ $Issue->delete();
 # Documentation
 
 > NOTE: all examples in this documentation related to any interaction with JIRA consider you configured 'global'
-> client object.  Read [Configure the client](#configure-the-client) section above to know how to do that.
+> client object.  
+>
+> Read [Configure the client](#configure-the-client) section above to know how to do that.
 
 ## Client and ClientRaw
 
@@ -135,7 +137,7 @@ The structured client also has a 'global' client object. This object can be acce
 ```php
 $Client = \Badoo\Jira\REST\Client::instance();
 ```
-The under the hood is 'new \Badoo\Jira\REST\Client()', but ::instance() will always return you the same
+Under the hood is 'new \Badoo\Jira\REST\Client()', but ::instance() will always return you the same
 object for all calls to method.
 
 Almost all wrapper classes inside `\Badoo\Jira` library require a configured API client to work.
