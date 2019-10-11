@@ -830,7 +830,6 @@ class Issue
         );
     }
 
-
     /**
      * Add labels to issue, keeping all labels it already has
      *
@@ -1383,7 +1382,7 @@ class Issue
         return $this->getHistory()->getWorkdaysInStatus($status);
     }
 
-    public function getLinks()
+    public function getLinks() : \Badoo\Jira\Issue\LinksList
     {
         $cache_key = 'Links';
 
