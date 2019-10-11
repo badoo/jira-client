@@ -5,7 +5,7 @@ Issues, Components and so on.
 This make code easier to write because of autocompletion your IDE will provide you.
 
 You can also generate lots of classes for custom fields to get the documentation for your own JIRA installation
-right in PHP code.
+right in PHP code and get all the benefits of IDE autocompletion.
 
 # Quick start
 
@@ -72,6 +72,7 @@ $Issue->save();
 ```
 
 ## Delete the issue
+
 ```php
 $Issue = new \Badoo\Jira\Issue('SMPL-1');
 $Issue->delete();
@@ -80,7 +81,7 @@ $Issue->delete();
 # Documentation
 
 > NOTE: all examples in this documentation related to any interaction with JIRA consider you configured 'global'
-> client object.  Read 'Structured client \Badoo\Jira\REST\Client' section first to know how to do that.
+> client object.  Read [Configure the client](#create-new-issue) section above to know how to do that.
 
 ## Client and ClientRaw
 
@@ -188,7 +189,7 @@ $Issue = new \Badoo\Jira\Issue('SMPL-1', $Client);
 
 If you want, you can instantiate another API client and provide it to `\Badoo\Jira\Issue` constructor.
 This might be useful when you have several JIRA instances and want to work with them from single piece of code.
-Look at 'Client and ClientRaw' section of documentation to see how to configure instance of API client.
+Look at [Client and ClientRaw](#client-and-clientraw) section of documentation to see how to configure instance of API client.
 
 ### Updating the issue
 
