@@ -1382,7 +1382,7 @@ class Issue
         return $this->getHistory()->getWorkdaysInStatus($status);
     }
 
-    public function getLinks() : \Badoo\Jira\Issue\LinksList
+    public function getLinksList() : \Badoo\Jira\Issue\LinksList
     {
         $cache_key = 'Links';
 

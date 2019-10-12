@@ -54,7 +54,7 @@ class LinksList
     public static function forIssue(string $issue_key, \Badoo\Jira\REST\Client $Jira = null) : LinksList
     {
         $Issue = \Badoo\Jira\Issue::byKey($issue_key, ['issuelinks'], [], $Jira);
-        return $Issue->getLinks();
+        return $Issue->getLinksList();
     }
 
     public function __construct(\Badoo\Jira\Issue $Issue)
