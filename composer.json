@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Jira REST API client with comfortable wrappers for most commonly used API instances like issues, custom fields, components and so on",
     "minimum-stability": "stable",
-    "license": "GPLv3",
+    "license": "GPL-3.0-only",
     "homepage": "https://badoo.com/",
     "authors": [
         {
