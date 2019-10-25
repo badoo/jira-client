@@ -24,7 +24,7 @@ $Request
 
 // ...
 
-$Issue = $Request->create();
+$Issue = $Request->send();
 
 print_r(
     [

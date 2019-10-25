@@ -35,7 +35,7 @@ $Request
     ->setLabels(['hey', 'it_works!'])
     ->addComponent('Other');
 
-$Issue = $Request->create();
+$Issue = $Request->send();
 
 print_r(
     [

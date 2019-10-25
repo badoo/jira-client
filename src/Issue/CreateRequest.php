@@ -22,7 +22,7 @@ namespace Badoo\Jira\Issue;
  *        ->setFieldValue('Issue for', 'PHP')
  *        ->setFieldValue('Translate it', 'No');
  *
- *      $Issue = $CreateRequest->create();
+ *      $Issue = $CreateRequest->send();
  */
 class CreateRequest
 {
@@ -538,7 +538,7 @@ class CreateRequest
      * @throws \Badoo\Jira\REST\Exception
      * @throws \Badoo\Jira\Exception\Issue for unexpected JIRA response.
      */
-    public function create() : \Badoo\Jira\Issue
+    public function send() : \Badoo\Jira\Issue
     {
         $fields = $this->fields;
 
