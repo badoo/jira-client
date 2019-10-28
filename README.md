@@ -417,6 +417,15 @@ but \Badoo\Jira\Issue has no idea how many additional ->get<Field>() calls it wi
 so it is better to load all info once, than ask API many times, when you need the summary, then the description, status,
 priority and so on.
 
+We compared the time it takes the JIRA to load the data and send it to the client (see examples/measure-load-time.php).
+It may vary from installation to installation, but almost always (as far as we know - always) the 'get all fields'
+request will be more effective than 3 'get single field' requests and frequently it will be more effective than 2 ones.
+
+```text
+Get single field time: 0.42949662208557
+Get all fields time: 0.84061505794525
+```
+
 You can make it do the API call immediately after new instance creation by using one of class' static methods:
 ```php
 $Issue = \Badoo\Jira\Issue::byKey('SMPL-1'); // causes request to JIRA API
