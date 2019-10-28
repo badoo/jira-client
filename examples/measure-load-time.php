@@ -43,4 +43,4 @@ foreach ($issue_keys as $issue_key) {
     ];
 }
 
-print_r($times);
+echo json_encode($times, JSON_PRETTY_PRINT) . "\n";
