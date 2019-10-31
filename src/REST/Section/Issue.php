@@ -322,7 +322,7 @@ class Issue extends Section
         $update_request = [];
 
         if (!empty($fields)) {
-            $create_request['fields'] = $fields;
+            $update_request['fields'] = $fields;
         }
 
         if (!empty($update)) {

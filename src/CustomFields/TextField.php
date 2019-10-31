@@ -24,14 +24,14 @@ abstract class TextField extends CustomField
         return (string)$this->getOriginalObject();
     }
 
-    /**]
-     * @param float|null $value
+    /**
+     * @param string $value
      * @return array
      */
     public static function generateSetter($value) : array
     {
         if ($value !== null) {
-            $value = (float)$value;
+            $value = (string)$value;
         }
 
         return [ ['set' => $value] ];
