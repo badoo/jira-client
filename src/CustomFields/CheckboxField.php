@@ -61,7 +61,7 @@ abstract class CheckboxField extends CustomField
      *
      * @throws \Badoo\Jira\REST\Exception
      */
-    public function getValue() : array
+    public function getValue()
     {
         return array_keys(array_filter($this->getCheckboxesState()));
     }

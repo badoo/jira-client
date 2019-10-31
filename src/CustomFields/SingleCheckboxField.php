@@ -28,4 +28,15 @@ abstract class SingleCheckboxField extends CheckboxField
     {
         return !$this->isEmpty();
     }
+
+    /**
+     * @return string - name of checked item, if any
+     *
+     * @throws \Badoo\Jira\REST\Exception
+     */
+    public function getValue()
+    {
+        $checked = parent::getValue();
+        return reset($checked) ?: '';
+    }
 }
