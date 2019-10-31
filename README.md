@@ -81,7 +81,7 @@ $Issue->delete();
 # Documentation
 
 > NOTE: all examples in this documentation related to any interaction with JIRA consider you configured 'global'
-> client object.  
+> client object.
 >
 > Read [Configure the client](#configure-the-client) section above to know how to do that.
 
@@ -217,7 +217,7 @@ $Issue->getSummary(); // will return new issue summary, as expected
 ### Checking if we can edit the field
 
 Not all fields can be changed even if you have them displayed in fields list.
-This can be caused by project permissions or issue edit screen configuration. To check if current user can update 
+This can be caused by project permissions or issue edit screen configuration. To check if current user can update
 field through API, use `->isEditable();`
 
 ```php
@@ -632,3 +632,24 @@ class Issue extends \Badoo\Jira\Issue {
 ```
 
 ## Writing your own custom field base class
+
+All custom fields should be inherited from `\Badoo\Jira\Issue\CustomFields\CustomField` class or one of its children
+The simplest examples of custom field base classes are `\Badoo\Jira\CustomFields\TextField` and
+`\Badoo\Jira\CustomFields\NumberField`.
+
+There are some additional special methods you should know about:
+* `$this->getOriginalObject()` - gets field value as it is provided by JIRA API.
+* `$this->dropCache()` - drops internal object cache, e.g. drops cached field value.
+
+`getOriginalObject()` method requests bound Issue object for current field value.
+It caches value inside current object, it is safe to call it multiple times in a row.
+This will not cause several API requests.
+We expect you to always use this method instead of `$this->Issue->getFieldValue()` when you write your own
+wrapper inherited directly from `\Badoo\Jira\Issue\CustomFields\CustomField`.
+
+`dropCache()` method is intended to drop all data about field value cached internally in object. If you plan to use
+internal properties in your custom class, don't forget to redefine `dropCache()` method so
+it clears values of your fields.
+
+`dropCache()` method is called by bound Issue object once it loads data from API. This is a way to notify all
+existing bound custom field objects that field value might have been updated.

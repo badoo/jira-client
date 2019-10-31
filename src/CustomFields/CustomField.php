@@ -47,6 +47,10 @@ abstract class CustomField
     }
 
     /**
+     * Get field value as it is returned by JIRA API.
+     * The method transparently loads value from JIRA API when it is not cached locally by CustomField or parent Issue
+     * objects.
+     *
      * @param array $expand - list of additional info required to be expaneded to get our field data.
      *                        Is empty in most cases
      *                        @see \Badoo\Jira\REST\Section\Issue::get DocBlock for more info
@@ -75,11 +79,17 @@ abstract class CustomField
         return $this;
     }
 
+    /**
+     * Get field issue. Current field's value is for this JIRA issue.
+     */
     public function getIssue() : \Badoo\Jira\Issue
     {
         return $this->Issue;
     }
 
+    /**
+     * Check if field has no value.
+     */
     public function isEmpty() : bool
     {
         return $this->getOriginalObject() === null;
@@ -94,7 +104,7 @@ abstract class CustomField
     }
 
     /**
-     * @return string - custom field's unique ID used in Rest API responses and requests (customfield_<number>)
+     * Custom field's unique ID used in REST API responses and requests (e.g. customfield_<number>)
      */
     public function getID() : string
     {
@@ -102,7 +112,10 @@ abstract class CustomField
     }
 
     /**
-     * @return int - numeric ID of custom field. The number after 'customfield_' prefix
+     * Numeric ID of custom field. The number after 'customfield_' prefix. You won't need it in most cases,
+     * as JIRA API uses IDs with prefix.
+     *
+     * @see \Badoo\Jira\CustomFields\CustomField::getID()
      */
     public function getCustomID() : int
     {
@@ -133,19 +146,20 @@ abstract class CustomField
     }
 
     /**
-     * Get last known field value (at the moment issue information had been loaded last time).
-     * If you want to know 'as fresh as possible' value, call ::update() method before this one.
+     * Get last known field value (at the moment issue information had been loaded from API last time).
+     * This value should be provided in native PHP structures (e.g. array, int, float) or in wrapper class objects
+     * (e.g. '\Badooo\Jira\User')
      *
      * @return mixed - current field value, parsed by parseValue()
      */
     abstract public function getValue();
 
     /**
-     * JIRA API accepts expects structures for changing field values
+     * JIRA API expects particular structures for changing field values.
      * Each custom field type requires it's own structure.
      * This method should convert simple data structure, like array of strings, into something expected by JIRA API.
      *
-     * See implementations of custom field types for examples of implementation:
+     * See implementations of custom field types as examples:
      * @see CheckboxField
      * @see TextField
      * @see UserField
@@ -175,11 +189,16 @@ abstract class CustomField
     }
 
     /**
-     * Save field value to Jira.
+     * Save field value to JIRA. This actually calls ->save() on bound Issue object.
+     *
+     * NOTE: when you use the same \Badoo\Jira\Issue object for several CustomField objects and change their values,
+     *       ->save() on one CustomField will cause actual update of all changed field values
+     *
      * @see \Badoo\Jira\REST\Section\Issue::edit DocBlock for more info about parameters meaning
      *
      * @param array $properties - list of properties for issue edit request
-     * @param bool $notify_users - send notification about issue update to users
+     * @param bool $notify_users - send notification about issue update to users.
+     *                             Requires administrator privileges in issue's project.
      *
      * @return $this
      *
