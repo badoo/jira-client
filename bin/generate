@@ -4,8 +4,9 @@
  * @package REST
  * @author Denis Korenevskiy <denkoren@corp.badoo.com>
  */
-
-require __DIR__ . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'autoload.php';
+require realpath(dirname(__DIR__)) .
+    DIRECTORY_SEPARATOR . 'src' .
+    DIRECTORY_SEPARATOR . 'autoload.php';
 
 const EXIT_OK                       = 0;
 const EXIT_GENERATION_FAILED        = 1;
