@@ -38,8 +38,10 @@ class History
         $Instance->Issue = $Issue;
 
         foreach ($records as $Record) {
-            $Instance->records[] = HistoryRecord::fromStdClass($Record, $Instance);
+            $Instance->records[strtotime($Record->created)] = HistoryRecord::fromStdClass($Record, $Instance);
         }
+        ksort($Instance->records);
+        $Instance->records = array_values($Instance->records);
 
         return $Instance;
     }
@@ -128,6 +130,10 @@ class History
             }
 
             $last_change_time = $change_time;
+        }
+
+        if ($this->Issue->getStatus()->getName() === $status_name) {
+            $time_in_status += time() - $last_change_time;
         }
 
         return $time_in_status;
