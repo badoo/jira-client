@@ -13,7 +13,7 @@ class Client extends \Badoo\Jira\REST\Section\Section
     public static function instance() : Client
     {
         if (!isset(static::$instance)) {
-            $Instance = new Client();
+            $Instance = new static;
             $Instance->Jira = ClientRaw::instance();
 
             static::$instance = $Instance;
