@@ -9,9 +9,9 @@ namespace Badoo\Jira\REST\Section;
 class IssueLink extends Section
 {
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLink-linkIssues
-     *
      * Create a link between two issues.
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLink-linkIssues
      *
      * @param string $type          - link type name. Don't mess with link texts for 'in' and 'out' ends.
      * @param string $inward_issue  - attach inward end of the link to this issue.
@@ -52,9 +52,9 @@ class IssueLink extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLink-getIssueLink
-     *
      * Get info for specific link between two issues
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLink-getIssueLink
      *
      * @param int $link_id - ID of link to get
      *
@@ -68,9 +68,9 @@ class IssueLink extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLink-deleteIssueLink
-     *
      * Delete a link between issues
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLink-deleteIssueLink
      *
      * @param int $link_id - ID of link to delete
      *

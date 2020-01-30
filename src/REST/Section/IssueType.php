@@ -19,9 +19,9 @@ class IssueType extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issuetype-getIssueAllTypes
-     *
      * List all issue types visible to the current user
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issuetype-getIssueAllTypes
      *
      * @param bool $reload_cache - ignore internal client cache and request API for fresh data
      *
@@ -43,9 +43,9 @@ class IssueType extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issuetype-getIssueType
-     *
      * Get issue type info
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issuetype-getIssueType
      *
      * @param int $id - unique ID of issue type
      * @param bool $reload_cache - ignore internal client cache and request API for fresh data

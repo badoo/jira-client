@@ -9,9 +9,9 @@ namespace Badoo\Jira\REST\Section;
 class Version extends Section
 {
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/version-createVersion
-     *
      * Create new version in given project
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/version-createVersion
      *
      * @param $project - project ID (e.g. 100500) or key (e.g. EX)
      * @param string $name - version name
@@ -43,9 +43,9 @@ class Version extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/version-updateVersion
-     *
      * Update version information.
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/version-updateVersion
      *
      * @param int $id
      * @param array $update - info to update. See API method description on web page for more information.
@@ -62,9 +62,9 @@ class Version extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/version-delete
-     *
      * Delete version
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/version-delete
      *
      * @param int $id - ID of verison to delete
      * @param string|null $move_fixed_to - replace deleted version with another one in fixVersions field,
@@ -90,9 +90,9 @@ class Version extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/version-moveVersion
-     *
      * Reorder versions sequence on page. Move given issue to the position, or put it after some other version in a list
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/version-moveVersion
      *
      * @param int $id
      * @param string $position - new absolute position of version in list
@@ -116,9 +116,9 @@ class Version extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/version-getVersion
-     *
      * Get full info about version with <ID>
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/version-getVersion
      *
      * @param int $id - ID of version to load from JIRA
      *

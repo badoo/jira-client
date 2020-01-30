@@ -28,9 +28,9 @@ class Group extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/group-createGroup
-     *
      * Create a new JIRA user group
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/group-createGroup
      *
      * @param string $name - the new group name
      *
@@ -53,9 +53,9 @@ class Group extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/group-removeGroup
-     *
      * Remove exiting JIRA user group, optionally transfering its restrictions to another group
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/group-removeGroup
      *
      * @param string $name - unique group name to be removed
      * @param string|null $swap_group - transfer restrictions to another group (replace deleted group settings to
@@ -78,9 +78,9 @@ class Group extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/group-getGroup
-     *
      * Get existing user group info
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/group-getGroup
      *
      * @param string    $name - unique group key to identify what you want to get
      * @param bool      $reload_cache - force cache reload and get the fresh data from JIRA
@@ -101,9 +101,9 @@ class Group extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/group-getUsersFromGroup
-     *
      * Get list of users in group with pagination of max 50 user in a response
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/group-getUsersFromGroup
      *
      * @param string    $name - group name
      * @param int       $start_at - starts from 0
@@ -186,9 +186,9 @@ class Group extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/group-addUserToGroup
-     *
      * Add user to group
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/group-addUserToGroup
      *
      * @param string $groupname - a name of group you want to add new user to
      * @param string $username - login of user to add
@@ -211,9 +211,9 @@ class Group extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/group-removeUserFromGroup
-     *
      * Remove user from group
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/group-removeUserFromGroup
      *
      * @param string $groupname - a name of group you want to remove user from
      * @param string $username - login of user to remove

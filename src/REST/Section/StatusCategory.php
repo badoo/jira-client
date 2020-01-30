@@ -19,9 +19,9 @@ class StatusCategory extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/statuscategory-getStatusCategoryes
-     *
      * Get list of all status categories configured in current JIRA installation
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/statuscategory-getStatusCategoryes
      *
      * @param bool $reload_cache - force API request to get fresh data from JIRA
      *
@@ -42,9 +42,9 @@ class StatusCategory extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/statuscategory-getStatusCategory
-     *
      * Get particular status category info identified by it's unique ID
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/statuscategory-getStatusCategory
      *
      * @param int $id - ID of statuscategory you want to load
      * @param bool $reload_cache - force API request to get fresh data from JIRA

@@ -96,9 +96,9 @@ class Client extends \Badoo\Jira\REST\Section\Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/search-search
-     *
      * Search for issues using JQL.
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/search-search
      *
      * @param string    $jql
      * @param string[]  $fields

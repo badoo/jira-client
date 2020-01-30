@@ -34,9 +34,9 @@ class User extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/user-createUser
-     *
      * Create a new JIRA user
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/user-createUser
      *
      * @param string    $name - user login
      * @param string    $password
@@ -70,10 +70,10 @@ class User extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/user-updateUser
-     *
      * Update exiting JIRA user
      * You can put 'null' in place of any parameter if you want to leave it unchanged
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/user-updateUser
      *
      * @param string    $name - user login to identify whom you want to update
      * @param string    $email - new user email
@@ -114,9 +114,9 @@ class User extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/user-removeUser
-     *
      * Remove exiting JIRA user
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/user-removeUser
      *
      * @param string $name - user login to identify whom you want to update
      *
@@ -129,9 +129,9 @@ class User extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/user-getUser
-     *
      * Get existing user info
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/user-getUser
      *
      * @param string    $name - user login to identify whom you want to get
      * @param string[]  $expand - provide additional fields information in response

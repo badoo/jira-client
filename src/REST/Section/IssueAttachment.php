@@ -56,9 +56,9 @@ class IssueAttachment extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue/{issueIdOrKey}/attachments-addAttachment
-     *
      * Attach new file to issue
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue/{issueIdOrKey}/attachments-addAttachment
      *
      * @param string $issue_key - key of issue to attach files to.
      * @param string $file_path - path to file to upload to Jira as attachment to an issue.

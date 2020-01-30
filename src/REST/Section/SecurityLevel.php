@@ -17,9 +17,9 @@ class SecurityLevel extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/securitylevel-getIssuesecuritylevel
-     *
      * Get particular security level info identified by it's unique ID
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/securitylevel-getIssuesecuritylevel
      *
      * @param int $id - ID of security level you want to load
      * @param bool $reload_cache - force API request to get fresh data from JIRA

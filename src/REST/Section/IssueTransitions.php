@@ -9,9 +9,9 @@ namespace Badoo\Jira\REST\Section;
 class IssueTransitions extends Section
 {
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getTransitions
-     *
      * List all transitions of given issue available for current user.
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getTransitions
      *
      * @param string $issue_key - list transitions for this issue
      * @param bool $expand_fields - provide list of fields available on transition screen.
@@ -33,9 +33,9 @@ class IssueTransitions extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getTransitions
-     *
      * Get information on particular issue transition
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getTransitions
      *
      * @param string $issue_key - list transitions for this issue
      * @param int $transition_id - get this transition info only
@@ -69,10 +69,9 @@ class IssueTransitions extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-doTransition
-     *
      * Perform transition for issue.
      *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-doTransition
      * @see \Badoo\Jira\REST\Section\Issue::edit DocBlock for parameters description
      *
      * @param string $issue_key     - perform transition for this issue.

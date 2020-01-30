@@ -19,9 +19,9 @@ class Priority extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/priority-getPriorities
-     *
      * List all known issue priorities
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/priority-getPriorities
      *
      * @param bool $reload_cache - force API request to load fresh data
      *
@@ -43,9 +43,9 @@ class Priority extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/priority-getPriority
-     *
      * Get particular priority info
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/priority-getPriority
      *
      * @param int  $id              - ID of priority
      * @param bool $reload_cache    - force API request to load fresh data
