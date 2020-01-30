@@ -145,7 +145,7 @@ class CreateRequest
 
             $this->available_fields[$FieldInfo->name] = $field_meta_info;
             if ($field_meta_info['custom'] ?? false) {
-                $this->available_fields[$FieldInfo->id] = $field_meta_info;
+                $this->available_fields[$field_id] = $field_meta_info;
             }
         }
     }
