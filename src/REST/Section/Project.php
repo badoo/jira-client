@@ -63,4 +63,31 @@ class Project extends Section
     {
         return $this->Jira->get("project/{$project}/versions");
     }
+
+    /**
+     * Returns latest version in project<br>
+     * **ATTENTION**:semver only
+     *
+     * @see https://www.php.net/manual/en/function.version-compare.php More about version comparison
+     *
+     * @param $project string|int
+     *
+     * @return \stdClass|null
+     *
+     * @throws \Badoo\Jira\REST\Exception
+     */
+    public function getLatestVersion($project) : ?\stdClass
+    {
+        $versions = $this->listVersions($project);
+        if (empty($versions)) {
+            return null;
+        }
+        $latest_version = array_pop($versions);
+        foreach ($versions as $version) {
+            if (version_compare($version->name ?? '', $latest_version->name ?? '', 'gt')) {
+                $latest_version = $version;
+            }
+        }
+        return $latest_version;
+    }
 }
