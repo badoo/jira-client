@@ -32,6 +32,20 @@ class Project extends Section
     }
 
     /**
+     * Returns all projects which are visible for the currently logged in user. If no user is logged in, it returns the list of projects that are visible when using anonymous access.
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/project
+     *
+     * @return array
+     *
+     * @throws \Badoo\Jira\REST\Exception
+     */
+    public function getAll() : array
+    {
+        return $this->Jira->get('project');
+    }
+
+    /**
      * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/project-getProjectComponents
      *
      * List all project components
