@@ -26,7 +26,9 @@ class Client extends \Badoo\Jira\REST\Section\Section
         $jira_url   = ClientRaw::DEFAULT_JIRA_URL,
         $api_prefix = ClientRaw::DEFAULT_JIRA_API_PREFIX
     ) {
-        $Jira = new ClientRaw($jira_url, $api_prefix);
+        $Jira = ClientRaw::instance()
+            ->setJiraUrl($jira_url)
+            ->setApiPrefix($api_prefix);
         parent::__construct($Jira);
     }
 
