@@ -90,4 +90,21 @@ class Project extends Section
         }
         return $latest_version;
     }
+
+
+    /**
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/project-getAllStatuses
+     *
+     * List all project statuses
+     *
+     * @param $project
+     *
+     * @return \stdClass[]
+     *
+     * @throws \Badoo\Jira\REST\Exception
+     */
+    public function listStatuses($project) : array
+    {
+        return $this->Jira->get("project/{$project}/statuses");
+    }
 }
