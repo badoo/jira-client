@@ -144,8 +144,8 @@ class CreateRequest
             $field_meta_info = $this->generateFieldMetaInfo($field_id, $FieldInfo);
 
             $this->available_fields[$FieldInfo->name] = $field_meta_info;
-            if ($FieldInfo->custom) {
-                $this->available_fields[$FieldInfo->id] = $field_meta_info;
+            if ($field_meta_info['custom'] ?? false) {
+                $this->available_fields[$field_id] = $field_meta_info;
             }
         }
     }
@@ -191,6 +191,7 @@ class CreateRequest
             'type'           => $field_type,
             'limited_values' => $has_limited_values,
             'allowed_values' => $values_range,
+            'custom'         => $is_custom,
         ];
     }
 
