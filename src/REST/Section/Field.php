@@ -16,9 +16,9 @@ class Field extends Section
     protected $custom_fields;
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/field-createCustomField
-     *
      * Create new custom field.
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/field-createCustomField
      *
      * @param string $name          - new custom field name
      * @param string $description   - field description
@@ -47,9 +47,9 @@ class Field extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/field-getFields
-     *
      * Get list of all fields, system and custom ones
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/field-getFields
      *
      * @param bool $reload_cache - force data reload. The method caches fields list, you can bypass cache and make it
      *                             to load fresh data from API once again.

@@ -19,9 +19,9 @@ class Resolution extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/resolution-getResolutions
-     *
      * Get list of all resolutions configured in current JIRA installation
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/resolution-getResolutions
      *
      * @param bool $reload_cache - force API request to get fresh data from JIRA
      *
@@ -42,9 +42,9 @@ class Resolution extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/resolution-getResolution
-     *
      * Get particular resolution info identified by it's unique ID
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/resolution-getResolution
      *
      * @param int $id - ID of resolution you want to load
      * @param bool $reload_cache - force API request to get fresh data from JIRA

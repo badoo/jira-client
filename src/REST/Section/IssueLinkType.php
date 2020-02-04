@@ -19,9 +19,9 @@ class IssueLinkType extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLinkType-getIssueLinkTypes
-     *
      * Get list of all known issue types
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLinkType-getIssueLinkTypes
      *
      * @param bool $reload_cache - ignore cache and load fresh data from API
      *
@@ -45,9 +45,9 @@ class IssueLinkType extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLinkType-createIssueLinkType
-     *
      * Create a link between two issues.
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLinkType-createIssueLinkType
      *
      * @param string $name      - link type name
      * @param string $outward   - text to display for inward issue
@@ -75,9 +75,9 @@ class IssueLinkType extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLinkType-getIssueLinkType
-     *
      * Get info for specific link type
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLinkType-getIssueLinkType
      *
      * @param int $link_type_id - ID of link type to get
      * @param bool $reload_cache - ignore cache and load fresh data from API
@@ -98,9 +98,9 @@ class IssueLinkType extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLinkType-updateIssueLinkType
-     *
      * Update link type information
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLinkType-updateIssueLinkType
      *
      * @param int $link_type_id - ID of link type to get
      * @param string $name      - new link type name. Empty string means 'do not update'.
@@ -140,9 +140,9 @@ class IssueLinkType extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLink-deleteIssueLink
-     *
      * Delete a link between issues
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issueLink-deleteIssueLink
      *
      * @param int $link_id - ID of link to delete
      *

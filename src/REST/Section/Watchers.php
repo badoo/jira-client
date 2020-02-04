@@ -9,11 +9,12 @@ namespace Badoo\Jira\REST\Section;
 class Watchers extends Section
 {
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getIssueWatchers
-     *
      * List issue watchers
      *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getIssueWatchers
+     *
      * @param string $issue_key
+     *
      * @return \stdClass[] - list of <Jira user info> objects
      *
      * @throws \Badoo\Jira\REST\Exception
@@ -30,9 +31,9 @@ class Watchers extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-addWatcher
-     *
      * Add watcher to issue
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-addWatcher
      *
      * @param string $issue_key
      * @param string $user_login
@@ -45,9 +46,9 @@ class Watchers extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-removeWatcher
-     *
      * Stop watching issue
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-removeWatcher
      *
      * @param string $issue_key
      * @param string $user_login

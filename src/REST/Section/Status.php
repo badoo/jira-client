@@ -19,9 +19,9 @@ class Status extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/status-getStatuses
-     *
      * Get list of all statuses configured in current JIRA installation
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/status-getStatuses
      *
      * @param bool $reload_cache - force API request to get fresh data from JIRA
      *
@@ -42,9 +42,9 @@ class Status extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/status-getStatus
-     *
      * Get particular status info identified by it's unique ID
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/status-getStatus
      *
      * @param int $id - ID of status you want to load
      * @param bool $reload_cache - force API request to get fresh data from JIRA

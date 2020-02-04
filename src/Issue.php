@@ -125,9 +125,9 @@ class Issue
     }
 
     /**
-     * @see \Badoo\Jira\REST\Section\Issue::search()
-     *
      * Load list of issues using search query in Jira Query Language.
+     *
+     * @see \Badoo\Jira\REST\Section\Issue::search()
      *
      * @param string   $jql    - search query string
      * @param string[] $fields - load only listed field values
@@ -169,9 +169,9 @@ class Issue
     }
 
     /**
-     * @see \Badoo\Jira\REST\Section\Issue::get()
-     *
      * Load info for issue identified by key from Jira using REST API
+     *
+     * @see \Badoo\Jira\REST\Section\Issue::get()
      *
      * @param string $issue_key
      * @param string[] $fields - request only fields listed
@@ -202,9 +202,9 @@ class Issue
     }
 
     /**
-     * @see \Badoo\Jira\REST\Section\Issue::search()
-     *
      * Load list of issues by their keys from Jira REST API
+     *
+     * @see \Badoo\Jira\REST\Section\Issue::search()
      *
      * @param string[] $issue_keys - list of issue keys for issues load
      * @param string[] $fields     - load only listed field values
@@ -606,6 +606,8 @@ class Issue
      *
      * @param bool $reload_cache - drop all internal caches of Issue object before getting fresh key.
      *                             This causes full data reload from API, with the same expands issue had before drop.
+     *
+     * @throws REST\Exception
      */
     public function updateKey(bool $reload_cache = false)
     {
@@ -650,6 +652,7 @@ class Issue
 
     /**
      * @param string[] $check_projects - list of project keys, e.g. 'ABC', 'DEF', and so on.
+     *
      * @return bool
      */
     public function isInProject(array $check_projects) : bool
@@ -698,6 +701,7 @@ class Issue
 
     /**
      * @param string $description
+     *
      * @return $this
      */
     public function setDescription(string $description) : Issue
@@ -815,7 +819,8 @@ class Issue
     /**
      * Set issue labels removing all ones it had before
      *
-     * @param string[] $labels
+     * @param string ...$labels
+     *
      * @return $this
      */
     public function setLabels(string ...$labels) : Issue
@@ -833,7 +838,8 @@ class Issue
     /**
      * Add labels to issue, keeping all labels it already has
      *
-     * @param string[] $labels
+     * @param string ...$labels
+     *
      * @return $this
      */
     public function addLabels(string ...$labels) : Issue
@@ -912,6 +918,7 @@ class Issue
 
     /**
      * @param int $id
+     *
      * @return $this
      */
     public function setPriority(int $id) : Issue
@@ -924,6 +931,11 @@ class Issue
         );
     }
 
+    /**
+     * @return Security|null
+     *
+     * @throws REST\Exception
+     */
     public function getSecurity() : ?\Badoo\Jira\Security
     {
         $cache_key = 'Security';
@@ -946,6 +958,7 @@ class Issue
 
     /**
      * @param int $id
+     *
      * @return $this
      */
     public function setSecurity(int $id) : \Badoo\Jira\Issue
@@ -989,6 +1002,7 @@ class Issue
      * Change issue resolution
      *
      * @param int $id
+     *
      * @return $this
      */
     public function setResolution(int $id) : \Badoo\Jira\Issue

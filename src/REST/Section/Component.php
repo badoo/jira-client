@@ -9,9 +9,9 @@ namespace Badoo\Jira\REST\Section;
 class Component extends Section
 {
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/component-getComponent
-     *
      * Get single JIRA Component data by ID
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/component-getComponent
      *
      * @param int    $id              - unique Component ID
      *
@@ -36,9 +36,9 @@ class Component extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/component-createComponent
-     *
      * Create new component with name <name> in project <project>
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/component-createComponent
      *
      * @param string|int $project     - parent project ID or key (e.g. 10000 or 'EX')
      * @param string $name            - component name
@@ -65,10 +65,10 @@ class Component extends Section
     }
 
     /**
+     * Update an existing component
+     *
      * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/component-updateComponent
      * @see Component::create() method DocBlock for more info about parameters and returned data.
-     *
-     * Update an existing component
      *
      * @param int   $id         - unique Component ID
      * @param array $update     - fields to update
@@ -97,9 +97,9 @@ class Component extends Section
 
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/component-delete
-     *
      * Delete an existing Component
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/component-delete
      *
      * @param int $id               - unique Component ID
      * @param int $move_issues_to   - apply this component to all issues, who had the deleted one

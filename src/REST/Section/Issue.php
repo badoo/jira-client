@@ -53,9 +53,9 @@ class Issue extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue
-     *
      * Get issue info as array
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue
      *
      * @param string $issue_key
      * @param array  $fields
@@ -89,13 +89,13 @@ class Issue extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/search-search
-     *
      * Search for issues using JQL.
      * This method is the same to Client->search() one with some differencies:
      *  - it returns the list of issues from 'issues' response field.
      *  - it has much higher max_results default value
      *  - it always validates your query, you can't disable it
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/search-search
      *
      * @param string    $jql
      * @param string[]  $fields
@@ -133,9 +133,9 @@ class Issue extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-assign
-     *
      * Assign issue to a user
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-assign
      *
      * @param string $issue_key
      * @param string|null $user_name -   '-1' = default assignee for project.
@@ -149,10 +149,10 @@ class Issue extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getTransitions
-     *
      * List transitions available for issue in it's current state.
      * NOTE: 'fields' section with available/required fields exists only when <expand_fields> is set to true.
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getTransitions
      *
      * @param string $issue_key
      * @param bool   $expand_fields - add list of fields available for modification during each transition to response
@@ -195,10 +195,10 @@ class Issue extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getCreateIssueMeta
-     *
      * Get metainformation about the issue creation for specific projects and issue types: fields available on
      * creation screen, their possible values and so on.
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getCreateIssueMeta
      *
      * @param string|string[] $projects    - list of unique Jira Project keys or IDs (e.g. IOS or 12345).
      * @param string|string[] $issue_types - list of unique Jira issue type names or IDs (e.g. 'Bug' or 12345)
@@ -259,9 +259,9 @@ class Issue extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getEditIssueMeta
-     *
      * Get metainformation about issue editing: what fields are available on edit screen, their possible values, etc.
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getEditIssueMeta
      *
      * @param string $issue_key
      * @return \stdClass[] - list of fields current user can edit in issue
@@ -279,9 +279,9 @@ class Issue extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-editIssue
-     *
      * Update issue fields
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-editIssue
      *
      * @param string $issue_key - update this issue
      * @param array  $fields    - a shorthand for issue update rules. Has simpler structure:
@@ -339,9 +339,9 @@ class Issue extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-createIssue
-     *
      * Create new issue
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-createIssue
      *
      * @param array $fields
      * @param array $update
