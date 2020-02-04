@@ -153,7 +153,7 @@ class Client extends \Badoo\Jira\REST\Section\Section
      * @param int       $start_at
      * @param bool      $validate_query
      *
-     * @return array - API response, parsed as JSON. You need to use 'issues' key to get actual list of issues from response
+     * @return \stdClass[] - API response, parsed as JSON. You need to use 'issues' key to get actual list of issues from response
      *
      * @throws \Badoo\Jira\REST\Exception
      */
