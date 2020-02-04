@@ -9,9 +9,9 @@ namespace Badoo\Jira\REST\Section;
 class Comment extends Section
 {
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getComments
-     *
      * List at most <max_results> comments starting from <start_at> for issue <issue_key>
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getComments
      *
      * @param string $issue_key       - parent issue key
      * @param int    $start_at        - list start position
@@ -47,9 +47,9 @@ class Comment extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getComment
-     *
      * Get single comment ID data
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-getComment
      *
      * @param string $issue_key       - parent issue key
      * @param int    $id              - unique comment ID
@@ -80,9 +80,9 @@ class Comment extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-addComment
-     *
      * Add a comment with text <text> to issue with key <issue_key>
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-addComment
      *
      * @param string $issue_key       - parent issue key
      * @param string $text            - comment body as raw text
@@ -114,10 +114,10 @@ class Comment extends Section
     }
 
     /**
+     * Update an existing comment
+     *
      * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-updateComment
      * @see Comment::create() method DocBlock for more info about parameters and returned data.
-     *
-     * Update an existing comment
      *
      * @param string $issue_key         - key of issue that contains the comment
      * @param int    $id                - unique comment ID
@@ -155,9 +155,9 @@ class Comment extends Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-deleteComment
-     *
      * Delete an existing comment
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/issue-deleteComment
      *
      * @param string $issue_key - key of issue that contains the comment
      * @param int $id           - unique comment ID

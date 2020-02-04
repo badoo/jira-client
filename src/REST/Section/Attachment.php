@@ -9,9 +9,9 @@ namespace Badoo\Jira\REST\Section;
 class Attachment extends \Badoo\Jira\REST\Section\Section
 {
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/attachment-getAttachment
-     *
      * Get attachment file metadata by file ID
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/attachment-getAttachment
      *
      * @param int $id - ID of attachment you want to load
      *
@@ -25,9 +25,9 @@ class Attachment extends \Badoo\Jira\REST\Section\Section
     }
 
     /**
-     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/attachment-removeAttachment
-     *
      * Delete attachment file from JIRA.
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/attachment-removeAttachment
      *
      * @param int $id - ID of file to delete
      *
