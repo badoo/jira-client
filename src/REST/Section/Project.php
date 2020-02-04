@@ -37,7 +37,7 @@ class Project extends Section
      *
      * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/project
      *
-     * @return array
+     * @return \stdClass[]
      *
      * @throws \Badoo\Jira\REST\Exception
      */
