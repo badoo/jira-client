@@ -41,7 +41,7 @@ class Project extends Section
      *
      * @throws \Badoo\Jira\REST\Exception
      */
-    public function getAll() : array
+    public function list() : array
     {
         return $this->Jira->get('project');
     }
