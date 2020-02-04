@@ -8,8 +8,14 @@ namespace Badoo\Jira\REST;
 
 class Client extends \Badoo\Jira\REST\Section\Section
 {
+    /**
+     * @var static|null
+     */
     protected static $instance = null;
 
+    /**
+     * @return static
+     */
     public static function instance() : Client
     {
         if (!isset(static::$instance)) {
@@ -19,6 +25,11 @@ class Client extends \Badoo\Jira\REST\Section\Section
         return static::$instance;
     }
 
+    /**
+     * Client constructor.
+     * @param string $jira_url
+     * @param string $api_prefix
+     */
     public function __construct(
         $jira_url   = ClientRaw::DEFAULT_JIRA_URL,
         $api_prefix = ClientRaw::DEFAULT_JIRA_API_PREFIX
@@ -29,65 +40,101 @@ class Client extends \Badoo\Jira\REST\Section\Section
         parent::__construct($Jira);
     }
 
+    /**
+     * @return ClientRaw
+     */
     public function getRawClient() : ClientRaw
     {
         return $this->Jira;
     }
 
+    /**
+     * @param string $url
+     * @return static
+     */
     public function setJiraUrl(string $url) : Client
     {
         $this->getRawClient()->setJiraUrl($url);
         return $this;
     }
 
+    /**
+     * @param string $login
+     * @param string $secret
+     * @return static
+     */
     public function setAuth(string $login, string $secret) : Client
     {
         $this->getRawClient()->setAuth($login, $secret);
         return $this;
     }
 
+    /**
+     * @return \Badoo\Jira\REST\Section\Jql
+     */
     public function jql() : \Badoo\Jira\REST\Section\Jql
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getSection('jql', \Badoo\Jira\REST\Section\Jql::class);
     }
 
+    /**
+     * @return \Badoo\Jira\REST\Section\Attachment
+     */
     public function attachment() : \Badoo\Jira\REST\Section\Attachment
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getSection('attachment', \Badoo\Jira\REST\Section\Attachment::class);
     }
 
+    /**
+     * @return \Badoo\Jira\REST\Section\Project
+     */
     public function project() : \Badoo\Jira\REST\Section\Project
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getSection('project', \Badoo\Jira\REST\Section\Project::class);
     }
 
+    /**
+     * @return \Badoo\Jira\REST\Section\Component
+     */
     public function component() : \Badoo\Jira\REST\Section\Component
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getSection('component', \Badoo\Jira\REST\Section\Component::class);
     }
 
+    /**
+     * @return \Badoo\Jira\REST\Section\Issue
+     */
     public function issue() : \Badoo\Jira\REST\Section\Issue
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getSection('issue', \Badoo\Jira\REST\Section\Issue::class);
     }
 
+    /**
+     * @return \Badoo\Jira\REST\Section\IssueType
+     */
     public function issueType() : \Badoo\Jira\REST\Section\IssueType
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getSection('issuetype', \Badoo\Jira\REST\Section\IssueType::class);
     }
 
+    /**
+     * @return \Badoo\Jira\REST\Section\IssueLink
+     */
     public function issueLink() : \Badoo\Jira\REST\Section\IssueLink
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
         return $this->getSection('issuelink', \Badoo\Jira\REST\Section\IssueLink::class);
     }
 
+    /**
+     * @return \Badoo\Jira\REST\Section\IssueLinkType
+     */
     public function issueLinkType() : \Badoo\Jira\REST\Section\IssueLinkType
     {
         /** @noinspection PhpIncompatibleReturnTypeInspection */
