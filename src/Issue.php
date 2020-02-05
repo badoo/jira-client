@@ -259,8 +259,11 @@ class Issue
     }
 
     /**
-     * @param string $key
-     * @param mixed  $value
+     * Put data portion into internal object cache, storing it under <key> key
+     * NOTE: if another portion of data already exists under the same key, it will be silently overwritten.
+     *
+     * @param string $key - key to store data
+     * @param mixed  $value - data to be stored
      * @return $this
      */
     protected function cacheData($key, $value) : Issue
@@ -269,6 +272,13 @@ class Issue
         return $this;
     }
 
+    /**
+     * Check if data under key <key> is available in cache.
+     * NOTE: checks only for key existence, returns true even when value associated with key is 'null' or 'false'.
+     *
+     * @param string $key - key to check in cache
+     * @return bool - true when key with name <key> exists in cache
+     */
     protected function isCached($key) : bool
     {
         return array_key_exists($key, $this->cached_data);
