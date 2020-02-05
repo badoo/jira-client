@@ -38,7 +38,7 @@ class History
         $Instance->Issue = $Issue;
 
         foreach ($records as $Record) {
-            $Instance->records[strtotime($Record->created)] = HistoryRecord::fromStdClass($Record, $Instance);
+            $Instance->records[$Record->id] = HistoryRecord::fromStdClass($Record, $Instance);
         }
         ksort($Instance->records);
         $Instance->records = array_values($Instance->records);
