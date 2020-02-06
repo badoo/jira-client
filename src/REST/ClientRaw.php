@@ -41,16 +41,17 @@ class ClientRaw
     public static function instance() : ClientRaw
     {
         if (empty(self::$instance)) {
-            self::$instance = new self();
+            static::$instance = new self();
         }
 
         return self::$instance;
     }
 
     public function __construct(
-        $jira_url   = self::DEFAULT_JIRA_URL,
-        $api_prefix = self::DEFAULT_JIRA_API_PREFIX
-    ) {
+        string $jira_url   = self::DEFAULT_JIRA_URL,
+        string $api_prefix = self::DEFAULT_JIRA_API_PREFIX
+    )
+    {
         $this->setJiraUrl($jira_url);
         $this->setApiPrefix($api_prefix);
     }
@@ -62,7 +63,7 @@ class ClientRaw
     /**
      * Set credentials to use in each request to Jira REST API.
      * @param string $login  - user login
-     * @param string $secret - raw user passowrd (deprecated) or API token (good)
+     * @param string $secret - raw user password (deprecated) or API token (good)
      *
      * @return ClientRaw
      */
