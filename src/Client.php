@@ -1,8 +1,7 @@
 <?php
 /**
- * @team QA <qa@corp.badoo.com>
- * @maintainer Petr Travkin <petr.travkin@corp.badoo.com>
  * @package Jira
+ * @maintainer Petr Travkin <petr.travkin@corp.badoo.com>
  */
 
 namespace Badoo\Jira;
