@@ -57,7 +57,7 @@ class Client
     }
 
     /**
-     * @param string $jql
+     * @param string $jql - search query string. {@link https://deviniti.com/atlassian/a-short-guide-to-the-jira-query-language/ Short introduction}
      * @param int $limit
      * @param int $offset
      *
@@ -89,10 +89,13 @@ class Client
     }
 
     /**
+     * Delete issue from Jira.
+     *
+     * **DANGER**: This action is applied immediately and can't be undone. Be careful.
+     *
      * @param string $issue_key
      * 
      * @throws \Badoo\Jira\Exception\Issue
-     * 
      * @throws \Badoo\Jira\REST\Exception
      */
     public function deleteIssue(string $issue_key) : void 
@@ -101,24 +104,27 @@ class Client
     }
 
     /**
-     * @param string $name
+     * Get user from API by ID (lazy load)
+     *
+     * @param string $name - name of user in JIRA.
+     *
+     * <b>Don't mess with display name you see in UI!</b>
      *
      * @return \Badoo\Jira\User
-     *
-     * @throws \Badoo\Jira\REST\Exception
      */
     public function getUser(string $name) : \Badoo\Jira\User
     {
-        return \Badoo\Jira\User::get($name, $this->RESTClient);
+        return new \Badoo\Jira\User($name, $this->RESTClient);
     }
 
     /**
-     * @param string $email
+     * Search for user by exact match in email address
+     *
+     * @param string $email - user email
      *
      * @return \Badoo\Jira\User
      *
      * @throws \Badoo\Jira\Exception\User
-     *
      * @throws \Badoo\Jira\REST\Exception
      */
     public function getUserByEmail(string $email) : \Badoo\Jira\User
@@ -128,7 +134,10 @@ class Client
     }
 
     /**
-     * @param string $pattern
+     * Search for users by login. display name or email.
+     * This gives you a result similar to the one you get in 'Uses' administration page of JIRA Web UI.
+     *
+     * @param string $pattern - user login, display name or email
      *
      * @return \Badoo\Jira\User[]
      *
@@ -140,19 +149,22 @@ class Client
     }
 
     /**
-     * @param int $id
+     * Get component info by ID (lazy loading)
+     *
+     * @param int $id - component id
      *
      * @return \Badoo\Jira\Component
      *
-     * @throws \Badoo\Jira\REST\Exception
      */
     public function getComponent(int $id) : \Badoo\Jira\Component
     {
-        return \Badoo\Jira\Component::get($id, $this->RESTClient);
+        return new \Badoo\Jira\Component($id, $this->RESTClient);
     }
 
     /**
-     * @param $project
+     * Get all components associated with project
+     *
+     * @param $project - project key or ID
      *
      * @return \Badoo\Jira\Component[]
      *
@@ -180,19 +192,21 @@ class Client
     }
 
     /**
-     * @param $project
-     * @param string $component_name
+     * @param $project - project key or ID
+     * @param string $name - name of component to check
      *
      * @return bool
      *
      * @throws REST\Exception
      */
-    public function isComponentExists($project, string $component_name) : bool
+    public function isComponentExists($project, string $name) : bool
     {
-        return \Badoo\Jira\Component::exists($project, $component_name, $this->RESTClient);
+        return \Badoo\Jira\Component::exists($project, $name, $this->RESTClient);
     }
 
     /**
+     * Get group of users by group name
+     *
      * @param string $name
      *
      * @return \Badoo\Jira\Group
