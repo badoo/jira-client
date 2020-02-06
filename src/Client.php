@@ -164,16 +164,19 @@ class Client
     }
 
     /**
-     * @param string $name
+     * Search for component in a project by name instead of getting it directly by ID.
+     *
+     * @param $project - project key or id
+     * @param string $name - name of component you want to get
      *
      * @return \Badoo\Jira\Component
      *
      * @throws Exception
      * @throws Exception\Component
      */
-    public function getComponentByName(string $name) : \Badoo\Jira\Component
+    public function getComponentByName($project, string $name) : \Badoo\Jira\Component
     {
-        return \Badoo\Jira\Component::byName($name, $this->RESTClient);
+        return \Badoo\Jira\Component::byName($project, $name, $this->RESTClient);
     }
 
     /**
