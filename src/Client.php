@@ -16,16 +16,16 @@ class Client
     /**
      * @var \Badoo\Jira\REST\Client
      */
-    private $Client;
+    private $RESTClient;
 
     /**
      * Client constructor.
      *
-     * @param \Badoo\Jira\REST\Client $Client
+     * @param \Badoo\Jira\REST\Client $RESTClient
      */
-    public function __construct(\Badoo\Jira\REST\Client $Client)
+    public function __construct(\Badoo\Jira\REST\Client $RESTClient)
     {
-        $this->Client = $Client;
+        $this->RESTClient = $RESTClient;
     }
 
     /**
@@ -38,7 +38,7 @@ class Client
      */
     public function getIssue(string $issue_key) : \Badoo\Jira\Issue
     {
-        return \Badoo\Jira\Issue::byKey($issue_key, [], [], $this->Client);
+        return \Badoo\Jira\Issue::byKey($issue_key, [], [], $this->RESTClient);
     }
 
     /**
@@ -70,7 +70,7 @@ class Client
      */
     public function searchIssue(string $jql, int $limit, int $offset) : array
     {
-        return \Badoo\Jira\Issue::search($jql, [], [], $limit, $offset, $this->Client);
+        return \Badoo\Jira\Issue::search($jql, [], [], $limit, $offset, $this->RESTClient);
     }
 
     /**
@@ -85,7 +85,7 @@ class Client
      */
     public function createIssue(string $project_key, $issue_type) : \Badoo\Jira\Issue\CreateRequest
     {
-        return new \Badoo\Jira\Issue\CreateRequest($project_key, $issue_type, $this->Client);
+        return new \Badoo\Jira\Issue\CreateRequest($project_key, $issue_type, $this->RESTClient);
     }
 
     /**
@@ -109,7 +109,7 @@ class Client
      */
     public function getUser(string $name) : \Badoo\Jira\User
     {
-        return \Badoo\Jira\User::get($name, $this->Client);
+        return \Badoo\Jira\User::get($name, $this->RESTClient);
     }
 
     /**
@@ -123,7 +123,7 @@ class Client
      */
     public function getUserByEmail(string $email) : \Badoo\Jira\User
     {
-        return \Badoo\Jira\User::byEmail($email, $this->Client);
+        return \Badoo\Jira\User::byEmail($email, $this->RESTClient);
 
     }
 
@@ -136,7 +136,7 @@ class Client
      */
     public function searchUser(string $pattern) : array
     {
-        return \Badoo\Jira\User::search($pattern, $this->Client);
+        return \Badoo\Jira\User::search($pattern, $this->RESTClient);
     }
 
     /**
@@ -148,7 +148,7 @@ class Client
      */
     public function getComponent(int $id) : \Badoo\Jira\Component
     {
-        return \Badoo\Jira\Component::get($id, $this->Client);
+        return \Badoo\Jira\Component::get($id, $this->RESTClient);
     }
 
     /**
@@ -160,7 +160,7 @@ class Client
      */
     public function getComponentsForProject($project) : array
     {
-        return \Badoo\Jira\Component::forProject($project, $this->Client);
+        return \Badoo\Jira\Component::forProject($project, $this->RESTClient);
     }
 
     /**
@@ -173,7 +173,7 @@ class Client
      */
     public function getComponentByName(string $name) : \Badoo\Jira\Component
     {
-        return \Badoo\Jira\Component::byName($name, $this->Client);
+        return \Badoo\Jira\Component::byName($name, $this->RESTClient);
     }
 
     /**
@@ -186,7 +186,7 @@ class Client
      */
     public function isComponentExists($project, string $component_name) : bool
     {
-        return \Badoo\Jira\Component::exists($project, $component_name, $this->Client);
+        return \Badoo\Jira\Component::exists($project, $component_name, $this->RESTClient);
     }
 
     /**
@@ -198,7 +198,7 @@ class Client
      */
     public function getGroup(string $name) : \Badoo\Jira\Group
     {
-        return \Badoo\Jira\Group::fromStdClass($this->Client->group()->get($name));
+        return \Badoo\Jira\Group::fromStdClass($this->RESTClient->group()->get($name));
     }
 
 
