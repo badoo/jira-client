@@ -40,11 +40,11 @@ class ClientRaw
 
     public static function instance() : ClientRaw
     {
-        if (empty(self::$instance)) {
+        if (empty(static::$instance)) {
             static::$instance = new self();
         }
 
-        return self::$instance;
+        return static::$instance;
     }
 
     public function __construct(
