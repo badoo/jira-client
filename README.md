@@ -1,4 +1,25 @@
+* [Introduction](#introduction)
+* [Quick start](#quick-start)
+  * [Install](#install)
+  * [Initialize the client](#initialize-the-client)
+  * [Create new issue](#create-new-issue)
+  * [Get existing issue](#get-the-issue)
+  * [Update existing issue](#update-the-issue)
+  * [Delete exiting issue](#delete-the-issue)
+* [Documentation](#documentation)
+  * [Client and ClientRaw](#client-and-clientraw)
+  * [\Badoo\Jira\Issue class](#badoojiraissue-class)
+  * [Custom fields](#custom-fields)
+  * [Issue changelog](#issue-changelog)
+  * [Other instances](#other-instances-of-the-badoo-jira-api-client)
+* [Advanced topics](#advanced-topics)
+  * [Managing API requests](#managing-api-requests)
+  * [Extending \Badoo\Jira\Issue](#extending-badoojiraissue)
+  * [Writing new CustomField base class](#writing-your-own-custom-field-base-class)
+
+
 # Introduction
+
 This is Badoo JIRA REST Client. It contains a bunch of wrapper classes for most common API objects:
 Issues, Components and so on.
 
@@ -6,6 +27,7 @@ This makes code easier to write because of autocompletion your IDE will provide 
 
 You can also generate lots of classes for custom fields to get the documentation for your own JIRA installation
 right in PHP code.
+
 
 # Quick start
 
@@ -15,7 +37,7 @@ right in PHP code.
 composer require badoo/jira-client
 ```
 
-## Configure the client
+## Initialize the client
 
 ```php
 $Jira = \Badoo\Jira\REST\Client::instance();
@@ -347,7 +369,7 @@ Discover it's methods using your IDE autocompletion, they might be useful!
 
 ## Other instances of the Badoo JIRA API Client
 
-Most of the wrapper classes, e.g. User, Status, Priority and so on, have ability to transparenty load data from API on
+Most of the wrapper classes, e.g. User, Status, Priority and so on, have ability to transparently load data from API on
 demand.
 
 As for CustomFields and Issue objects, you have 2 ways of initialization: with static methods (e.g. `::get()`)
