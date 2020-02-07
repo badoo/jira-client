@@ -14,6 +14,10 @@ class Client extends \Badoo\Jira\REST\Section\Section
     protected static $instance = null;
 
     /**
+     * 'Global'(default) cached instance of \Badoo\Jira\REST\Client
+     *
+     * **Use with caution**
+     *
      * @return static
      */
     public static function instance() : Client
