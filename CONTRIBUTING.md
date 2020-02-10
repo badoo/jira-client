@@ -145,19 +145,58 @@ and `->list.*()` ones MUST return array of `\stdClass` objects.
 #### Wrapper classes
 
 Wrapper classes for global JIRA objects, like `User`, `Issue` or `Version` are located at package namespace
-root `\Badoo\Jira`. Wrappers
+root `\Badoo\Jira`. Wrappers for
 
-* Wrapper classes MUST be able to load data transparently on demand.
+* Wrapper class constructor SHOULD expect minimum data for initialization and MUST NOT request API inside.
+  This approach allows developer to return wrapper objects from any part of their code having only partial data on them.
 
-* Wrapper class constructor method SHOULD expect minimum data for initialization
+  For example, one can return fully functional `\Badoo\Jira\Issue` object having only issue key in hands.
+  And one doesn't have to even know wether additional data on issue would be required: maybe the acceptors will require
+  only key and nothing more, or they expect to get issue changelog - the interface will be the same and no patches for
+  initial method will be required. This is convenient.
+  Look at `\Badoo\Jira\Version` or any other class constructor implementation as an example.
+
+* Wrapper class constructor SHOULD have `\Badoo\Jira\REST\Client` reference in its constructor and static methods.
+
+  This allows developer to work with several JIRA instances at the same time and keep objects bound to their JIRA
+  installation. `\Badoo\Jira\REST\Client` reference MUST be the last parameter of constructor or static method.
+
+* Wrapper classes MUST be able to load data transparently on demand. For example, when you created
+  `\Badoo\Jira\Security` object using only its ID and then tried to get level symbolic name, class must ask API
+  in background, _cache_ the response within the object and return the result.
+
+  Object-level caching provides
+  API requests optimization, that saves _a lot of time_ when you try to obtain several portions of information for the
+  same resource represented by the same object. We usually use `protected function getOriginalObject()` method for this.
 
 * Each wrapper class MUST have `::fromStdClass` static method which allows manual object initialization on response
-  from JIRA API
+  from JIRA API.
 
-* ...
+  This frees developers to use wrappers even when they get data not from REST API using our client.
+  For example, JIRA WebHooks provide your service with the same data sturctures in POST request body, as REST API would
+  (Issue, Changelog, User and so on). This approach makes possible to use wrappers naturally inside WebHooks.
 
+* Each wrapper class MUST follow static methods convention described in README.md:
+  * `::search()` static method provide interface to perform multi-criteria resources search. For example, in Issue search
+    you can provide complex JQL query and get several issues matching it.
 
-<Here would be the rules for wrapper classes>
+  * `::get()` static method should return the object of current class with data, loaded from JIRA API by primary resource
+    identifier. In most cases it is resource ID, like in `\Badoo\Jira\Issue\Priority` classes, or some sort of key,
+    like in `\Badoo\Jira\User` or `\Badoo\Jira\Issue` classes.
+
+    This method SHOULD be equal to class' constructor with the only difference: it immediately triggers the data load
+    from JIRA API, providing developer with instrument to control API calls.
+
+  * `::by<Criteria>()` static methods should initialize single or multiple objects identified by single criteria.
+    For example, in `\Badoo\Jira\User` class you can get user by user name (with `::get()`) or by its email
+    (with `byEmail()`). Both of them expected to be unique for user.
+
+  * `::for<Instance>()` static methods should look for all items somehow related to the Instance. For example, to get
+    all comments of single issue, developer could have used
+    `\Badoo\Jira\Issue\Comment::forIssue(string $issue_key) : array` if it was existing
+    (hey, that's a theme for your first pull request!).
+
+    See `\Badoo\Jira\Version::forProject()` as an implementation example.
 
 
 ## Make a commit and mere request
