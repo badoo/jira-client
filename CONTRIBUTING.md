@@ -198,10 +198,16 @@ root `\Badoo\Jira`. Wrappers for
 
     See `\Badoo\Jira\Version::forProject()` as an implementation example.
 
+## Write some unit tests for your new class
+
+I know, this sounds fun when you look at our tests folder, but we really need tests :)
+We will highly appreciate if you provide the new wrapper class with one or two. Thanks.
+
 
 ## Make a commit and mere request
 
 When writing the commit message, please follow the recommendations described
 in [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
-This simple rules ease new library versions documentation a lot and make git history
+
+Theese simple rules ease new library versions documentation a lot and make git history
 readable and clear.
