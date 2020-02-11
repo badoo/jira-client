@@ -7,7 +7,7 @@
     * [Exceptions](#exceptions)
     * [REST API Client](#api-client)
     * [Wrapper classes](#wrapper-classes)
-* [Make a commit and MR](#make-a-commit-and-mere-request)
+* [Make a commit and PR](#make-a-commit-and-pull-request)
 
 ## Setup the environment
 
@@ -204,7 +204,7 @@ I know, this sounds fun when you look at our tests folder, but we really need te
 We will highly appreciate if you provide the new wrapper class with one or two. Thanks.
 
 
-## Make a commit and mere request
+## Make a commit and pull request
 
 When writing the commit message, please follow the recommendations described
 in [conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) specification.
