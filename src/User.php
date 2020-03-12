@@ -139,9 +139,9 @@ class User
     }
 
     /**
-     * Search for user by exact match in email address
+     * Search for user by exact match in user key
      *
-     * @param string $key - user email
+     * @param string $key - user key
      * @param \Badoo\Jira\REST\Client $Jira - JIRA API client to use instead of global one.
      *                                        Enables you to access several JIRA instances from one piece of code,
      *                                        or use different users for different actions.
