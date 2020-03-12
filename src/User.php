@@ -139,6 +139,30 @@ class User
     }
 
     /**
+     * Search for user by exact match in email address
+     *
+     * @param string $key - user email
+     * @param \Badoo\Jira\REST\Client $Jira - JIRA API client to use instead of global one.
+     *                                        Enables you to access several JIRA instances from one piece of code,
+     *                                        or use different users for different actions.
+     *
+     * @return static
+     *
+     * @throws \Badoo\Jira\REST\Exception - on JIRA API interaction errors
+     */
+    public static function byKey(string $key, \Badoo\Jira\REST\Client $Jira = null) : User
+    {
+        if (null === $Jira) {
+            $Jira = \Badoo\Jira\REST\Client::instance();
+        }
+
+        return self::fromStdClass(
+            $Jira->user()->getByKey($key),
+            null,
+            $Jira);
+    }
+
+    /**
      * User constructor.
      *
      * @param string $name - name of user in JIRA. Don't mess with display name you see in UI!
