@@ -424,7 +424,7 @@ class CreateRequest
      */
     public function setSecurityLevel(int $level_id) : CreateRequest
     {
-        return $this->setFieldValue('Security Level', ['id' => $level_id]);
+        return $this->setFieldValue('Security Level', ['id' => (string)$level_id]);
     }
 
     /**
