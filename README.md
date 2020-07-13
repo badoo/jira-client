@@ -362,7 +362,7 @@ Let's consider you created custom field class (or classes) inside `\Example\Cust
 ```php
 $MyCustomField = \Example\CustomFields\MyCustomField::forIssue('SMPL-1'); // get field value from JIRA API
 
-$field_value = $MyCustomField->getValue();
+$Value = $MyCustomField->getValue();
 $field_is_empty = $Value->isEmpty(); // true when field has no value
 
 if ($Value->isEditable()) {
