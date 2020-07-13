@@ -245,11 +245,9 @@ $StagingIssue = new \Badoo\Jira\Issue('SMPL-1', $Staging);
 
 #### The simplest interface to API: \Badoo\Jira\REST\ClientRaw
 
-It can request API and parse responses.
-Throws an `\Badoo\Jira\REST\Exception` for API errors or parsed response data when everything went OK.
-
-That's all, it has no other complex logic inside: you decide what URI to request, which type of HTTP request to send
-(GET, POST, etc.) and what parameters to send.
+It can send request to API and parse response data.
+On API error, it throws \Badoo\Jira\REST\Exception.
+That's all, it has no other complex logic inside: you decide what URI to request, which type of HTTP request to send (GET, POST, etc.) and what parameters to send.
 
 Consider ClientRaw as a smart wrapper for PHP curl.
 
