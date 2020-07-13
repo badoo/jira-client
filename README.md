@@ -48,7 +48,7 @@ $Jira
 $Client = new \Badoo\Jira\Client($Jira);
 ```
 > NOTE: this action will save 'global' Jira rest config
-> Every time you using `\Badoo\Jira\REST\Client::instance()->set...()` methods, you changing `\Badoo\Jira\REST\ClientRaw::$instance` state
+> Every time you call a \Badoo\Jira\REST\Client::instance()->set...() method, \Badoo\Jira\REST\ClientRaw::$instance state is changed.
 > It's safe if you have only one url/login for Jira server
 > See [Client and ClientRaw](#client-and-clientraw)
 
@@ -62,7 +62,7 @@ $Client = new \Badoo\Jira\Client(\Badoo\Jira\REST\Client::instance());
 
 ```php
 /**
- * @var $Client \Badoo\Jira\Client
+ * @var \Badoo\Jira\Client $Client
  */
 $Issue = $Client->createIssue('SMPL', 'Task')
     ->setSummary('Awesome issue!')
@@ -83,7 +83,7 @@ print_r(
 #### Get one issue
 ```php
 /**
- * @var $Client \Badoo\Jira\Client
+ * @var \Badoo\Jira\Client $Client
  */
 $Issue = $Client->getIssue('SMPL-1');
 
@@ -98,22 +98,22 @@ print_r(
 #### Get more issues
 ```php
 /**
- * @var $Client \Badoo\Jira\Client
+ * @var \Badoo\Jira\Client $Client
  */
 $issue_keys = [
-'SMPL-1',
-'SMPL-2',
-'SMPL-3',
-'SMPL-4',
-//...
-'SMPL-10',
+    'SMPL-1',
+    'SMPL-2',
+    'SMPL-3',
+    'SMPL-4',
+    //...
+    'SMPL-10',
 ];
 
 $Issues = $Client->getIssues(...$issue_keys);
 
 foreach ($Issues as $Issue){
     /**
-     * @var $Issue \Badoo\Jira\Issue
+     * @var \Badoo\Jira\Issue $Issue
      */
     echo $Issue->getSummary();
 }
@@ -123,7 +123,7 @@ foreach ($Issues as $Issue){
 
 ```php
 /**
- * @var $Client \Badoo\Jira\Client
+ * @var \Badoo\Jira\Client $Client
  */
 $Client->getIssue('SMPL-1')
     ->setSummary('Awesome issue!')
@@ -137,7 +137,7 @@ $Client->getIssue('SMPL-1')
 
 ```php
 /**
- * @var $Client \Badoo\Jira\Client
+ * @var \Badoo\Jira\Client $Client
  */
 $Client->deleteIssue('SMPL-1');
 ```
@@ -146,14 +146,14 @@ $Client->deleteIssue('SMPL-1');
 #### Get user
 ```php
 /**
- * @var $Client \Badoo\Jira\Client
+ * @var \Badoo\Jira\Client $Client
  */
 $User = $Client->getUser('username');
 ```
 #### Get user by email
 ```php
 /**
- * @var $Client \Badoo\Jira\Client
+ * @var \Badoo\Jira\Client $Client
  */
 $Client->getUserByEmail('user@example.com');
 ```
@@ -189,7 +189,7 @@ But with `\Badoo\Jira\REST\Client` you can do this
 
 ```php
 /**
- * @var $Client \Badoo\Jira\REST\Client
+ * @var \Badoo\Jira\REST\Client $Client
  */
 $FieldInfo = $Client->field()->get('summary');
 print_r($FieldInfo);
@@ -198,7 +198,7 @@ print_r($FieldInfo);
 When you can't find something in structured client, you still can access Raw client inside it to do everything you need:
 ```php
 /**
- * @var $Client \Badoo\Jira\REST\Client
+ * @var \Badoo\Jira\REST\Client $Client
  */
 $response = $Client->getRawClient()->get('/method/you/wat/to/request', [<parameters]);
 ```
