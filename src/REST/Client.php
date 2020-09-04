@@ -14,30 +14,19 @@ class Client extends \Badoo\Jira\REST\Section\Section
     protected static $instance = null;
 
     /**
+     * 'Global'(default) cached instance of \Badoo\Jira\REST\Client
+     *
+     * **Use with caution**
+     *
      * @return static
      */
     public static function instance() : Client
     {
         if (!isset(static::$instance)) {
-            static::$instance = new static;
+            static::$instance = new static(ClientRaw::instance());
         }
 
         return static::$instance;
-    }
-
-    /**
-     * Client constructor.
-     * @param string $jira_url
-     * @param string $api_prefix
-     */
-    public function __construct(
-        $jira_url   = ClientRaw::DEFAULT_JIRA_URL,
-        $api_prefix = ClientRaw::DEFAULT_JIRA_API_PREFIX
-    ) {
-        $Jira = ClientRaw::instance()
-            ->setJiraUrl($jira_url)
-            ->setApiPrefix($api_prefix);
-        parent::__construct($Jira);
     }
 
     /**

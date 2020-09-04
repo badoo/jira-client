@@ -39,39 +39,37 @@ composer require badoo/jira-client
 
 ## Initialize the client
 
+### Rest Client
 ```php
 $Jira = \Badoo\Jira\REST\Client::instance();
 $Jira
     ->setJiraUrl('https://jira.example.com/')
     ->setAuth('user', 'token/password');
+$Client = new \Badoo\Jira\Client($Jira);
 ```
+> NOTE: this action will save 'global' Jira rest config
+> Every time you call a \Badoo\Jira\REST\Client::instance()->set...() method, \Badoo\Jira\REST\ClientRaw::$instance state is changed.
+> It's safe if you have only one url/login for Jira server
+> See [Client and ClientRaw](#client-and-clientraw)
 
-## Create new issue
+### Common Client
+```php
+$Client = new \Badoo\Jira\Client(\Badoo\Jira\REST\Client::instance());
+```
+## Basic operations
+### Issue
+#### Create new issue
 
 ```php
-$Request = new \Badoo\Jira\Issue\CreateRequest('SMPL', 'Task');
-
-$Request
+/**
+ * @var \Badoo\Jira\Client $Client
+ */
+$Issue = $Client->createIssue('SMPL', 'Task')
     ->setSummary('Awesome issue!')
     ->setDescription('description of issue created by Badoo JIRA PHP client')
     ->setLabels(['hey', 'it_works!'])
-    ->addComponent('Other');
-
-$Issue = $Request->send();
-
-print_r(
-    [
-        'key'           => $Issue->getKey(),
-        'summary'       => $Issue->getSummary(),
-        'description'   => $Issue->getDescription(),
-    ]
-);
-```
-
-## Get the issue
-
-```php
-$Issue = new \Badoo\Jira\Issue('SMPL-1');
+    ->addComponents('Other','Try it yourself')
+    ->send();
 
 print_r(
     [
@@ -82,22 +80,82 @@ print_r(
 );
 ```
 
-## Update the issue
+#### Get one issue
+```php
+/**
+ * @var \Badoo\Jira\Client $Client
+ */
+$Issue = $Client->getIssue('SMPL-1');
+
+print_r(
+    [
+        'key'           => $Issue->getKey(),
+        'summary'       => $Issue->getSummary(),
+        'description'   => $Issue->getDescription(),
+    ]
+);
+```
+#### Get more issues
+```php
+/**
+ * @var \Badoo\Jira\Client $Client
+ */
+$issue_keys = [
+    'SMPL-1',
+    'SMPL-2',
+    'SMPL-3',
+    'SMPL-4',
+    //...
+    'SMPL-10',
+];
+
+$Issues = $Client->getIssues(...$issue_keys);
+
+foreach ($Issues as $Issue){
+    /**
+     * @var \Badoo\Jira\Issue $Issue
+     */
+    echo $Issue->getSummary();
+}
+```
+
+#### Update the issue
 
 ```php
-$Issue
+/**
+ * @var \Badoo\Jira\Client $Client
+ */
+$Client->getIssue('SMPL-1')
     ->setSummary('Awesome issue!')
     ->setDescription('Yor new description for issue')
-    ->edit('customfield_12345', <value for field>);
+    ->edit('customfield_12345', ['add' => 'value for field'])
+    ->save();
 
-$Issue->save();
 ```
 
-## Delete the issue
+#### Delete the issue
 
 ```php
-$Issue = new \Badoo\Jira\Issue('SMPL-1');
-$Issue->delete();
+/**
+ * @var \Badoo\Jira\Client $Client
+ */
+$Client->deleteIssue('SMPL-1');
+```
+
+### User
+#### Get user
+```php
+/**
+ * @var \Badoo\Jira\Client $Client
+ */
+$User = $Client->getUser('username');
+```
+#### Get user by email
+```php
+/**
+ * @var \Badoo\Jira\Client $Client
+ */
+$Client->getUserByEmail('user@example.com');
 ```
 
 # Documentation
@@ -107,29 +165,17 @@ $Issue->delete();
 >
 > Read [Configure the client](#configure-the-client) section above to know how to do that.
 
-## Client and ClientRaw
+## Client, REST\Client and REST\ClientRaw
 
-The client to JIRA API is split into two parts:
+The client to JIRA API is split into three parts:
 
-#### The simplest interface to API: \Badoo\Jira\REST\ClientRaw
+#### Common Jira Client
 
-It can request API and parse responses.
-Throws an `\Badoo\Jira\REST\Exception` for API errors or parsed response data when everything went OK.
+A class that provides basic operations implemented in the library for issues, users, components and groups
 
-That's all, it has no other complex logic inside: you decide what URI to request, which type of HTTP request to send
-(GET, POST, etc.) and what parameters to send.
+Look at [Basic operations](#basic_operations)
 
-Consider ClientRaw as a smart wrapper for PHP curl.
-
-```php
-$RawClient = new \Badoo\Jira\REST\ClientRaw('https://jira.example.com');
-$RawClient->setAuth('user', 'token/password');
-
-$fields = $RawClient->get('/field');
-print_r($fields);
-```
-
-#### Structured client \Badoo\Jira\REST\Client
+#### Structured REST client \Badoo\Jira\REST\Client
 
 It is split into several sections, one for each prefix of API methods: e.g. /issue, /field, /project and so on.
 Each section has bindings to the  most popular API methods with parameters it accepts.
@@ -142,16 +188,18 @@ you can't get info on particular field by its ID using only API. You have also s
 But with `\Badoo\Jira\REST\Client` you can do this
 
 ```php
-$Client = new \Badoo\Jira\REST\Client('https://jira.example.com/');
-$Client->setAuth('user', 'password/token');
-
+/**
+ * @var \Badoo\Jira\REST\Client $Client
+ */
 $FieldInfo = $Client->field()->get('summary');
 print_r($FieldInfo);
 ```
 
 When you can't find something in structured client, you still can access Raw client inside it to do everything you need:
 ```php
-$Client = \Badoo\Jira\REST\Client::instance();
+/**
+ * @var \Badoo\Jira\REST\Client $Client
+ */
 $response = $Client->getRawClient()->get('/method/you/wat/to/request', [<parameters]);
 ```
 
@@ -183,17 +231,34 @@ several JIRA installations from one piece of code. For example, if you want to w
 instances at the same time:
 
 ```php
-$Prod = new \Badoo\Jira\REST\Client('https://jira.example.com/');
-$Prod->setAuth('user', 'password/token');
+$Prod = new \Badoo\Jira\REST\Client(new \Badoo\Jira\REST\ClientRaw('https://jira.example.com/'));
+$Prod->setAuth('produser', 'password/token');
 
-$Staging = new \Badoo\Jira\REST\Client('https://staging.jira.example.com/');
-$Staging->setAuth('user', 'password/token');
+$Staging = new \Badoo\Jira\REST\Client(new \Badoo\Jira\REST\ClientRaw('https://jira.example.com/'));
+$Staging->setAuth('staginguser', 'password/token');
 
 $ProdIssue = new \Badoo\Jira\Issue('SMPL-1', $Prod);
 $StagingIssue = new \Badoo\Jira\Issue('SMPL-1', $Staging);
 
 // ...
 ```
+
+#### The simplest interface to API: \Badoo\Jira\REST\ClientRaw
+
+It can send request to API and parse response data.
+On API error, it throws \Badoo\Jira\REST\Exception.
+That's all, it has no other complex logic inside: you decide what URI to request, which type of HTTP request to send (GET, POST, etc.) and what parameters to send.
+
+Consider ClientRaw as a smart wrapper for PHP curl.
+
+```php
+$RawClient = new \Badoo\Jira\REST\ClientRaw('https://jira.example.com');
+$RawClient->setAuth('user', 'token/password');
+
+$fields = $RawClient->get('/field');
+print_r($fields);
+```
+
 
 ## \Badoo\Jira\Issue class
 
@@ -295,7 +360,7 @@ Let's consider you created custom field class (or classes) inside `\Example\Cust
 ```php
 $MyCustomField = \Example\CustomFields\MyCustomField::forIssue('SMPL-1'); // get field value from JIRA API
 
-$field_value = $MyCustomField->getValue();
+$Value = $MyCustomField->getValue();
 $field_is_empty = $Value->isEmpty(); // true when field has no value
 
 if ($Value->isEditable()) {
