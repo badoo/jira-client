@@ -56,7 +56,7 @@ class Client
     }
 
     /**
-     * @param string $jql - search query string. {@link https://deviniti.com/atlassian/a-short-guide-to-the-jira-query-language/ Short introduction}
+     * @param string $jql search query string. {@link https://deviniti.com/atlassian/a-short-guide-to-the-jira-query-language/ Short introduction}
      * @param int $limit
      * @param int $offset
      *
@@ -73,8 +73,8 @@ class Client
     }
 
     /**
-     * @param string $project_key - key of project for new issue (e.g. EX, TEST, IOS)
-     * @param string|int $issue_type - textual name or ID of type for issue you are going to create (e.g. 'Bug' or 34)
+     * @param string $project_key key of project for new issue (e.g. EX, TEST, IOS)
+     * @param string|int $issue_type textual name or ID of type for issue you are going to create (e.g. 'Bug' or 34)
      *
      * @return \Badoo\Jira\Issue\CreateRequest
      *
@@ -99,13 +99,13 @@ class Client
      */
     public function deleteIssue(string $issue_key) : void 
     {
-        $this->getIssue($issue_key)->delete();;
+        $this->getIssue($issue_key)->delete();
     }
 
     /**
      * Get user from API by ID (lazy load)
      *
-     * @param string $name - name of user in JIRA.
+     * @param string $name name of user in JIRA.
      *
      * <b>Don't mess with display name you see in UI!</b>
      *
@@ -119,7 +119,7 @@ class Client
     /**
      * Search for user by exact match in email address
      *
-     * @param string $email - user email
+     * @param string $email user email
      *
      * @return \Badoo\Jira\User
      *
@@ -129,14 +129,13 @@ class Client
     public function getUserByEmail(string $email) : \Badoo\Jira\User
     {
         return \Badoo\Jira\User::byEmail($email, $this->RESTClient);
-
     }
 
     /**
      * Search for users by login. display name or email.
      * This gives you a result similar to the one you get in 'Uses' administration page of JIRA Web UI.
      *
-     * @param string $pattern - user login, display name or email
+     * @param string $pattern user login, display name or email
      *
      * @return \Badoo\Jira\User[]
      *
@@ -150,7 +149,7 @@ class Client
     /**
      * Get component info by ID (lazy loading)
      *
-     * @param int $id - component id
+     * @param int $id component id
      *
      * @return \Badoo\Jira\Component
      *
@@ -163,7 +162,7 @@ class Client
     /**
      * Get all components associated with project
      *
-     * @param $project - project key or ID
+     * @param string|int $project project key or ID
      *
      * @return \Badoo\Jira\Component[]
      *
@@ -177,8 +176,8 @@ class Client
     /**
      * Search for component in a project by name instead of getting it directly by ID.
      *
-     * @param $project - project key or id
-     * @param string $name - name of component you want to get
+     * @param string|int $project project key or id
+     * @param string $name name of component you want to get
      *
      * @return \Badoo\Jira\Component
      *
@@ -191,8 +190,8 @@ class Client
     }
 
     /**
-     * @param $project - project key or ID
-     * @param string $name - name of component to check
+     * @param string|int $project project key or ID
+     * @param string $name name of component to check
      *
      * @return bool
      *
@@ -216,6 +215,4 @@ class Client
     {
         return \Badoo\Jira\Group::fromStdClass($this->RESTClient->group()->get($name));
     }
-
-
 }
