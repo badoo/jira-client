@@ -41,7 +41,7 @@ class ClientRaw
     public static function instance() : ClientRaw
     {
         if (empty(static::$instance)) {
-            static::$instance = new self();
+            static::$instance = new static();
         }
 
         return static::$instance;
