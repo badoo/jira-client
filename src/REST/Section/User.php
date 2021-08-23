@@ -163,6 +163,41 @@ class User extends Section
     }
 
     /**
+     * Get existing user info by user key
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/user-getUser
+     *
+     * @param string    $key - user key to identify whom you want to get
+     *                          <p><b>don't mess with username!</b></p>
+     * @param string[]  $expand - provide additional fields information in response
+     *                              E.g.: 'groups', 'applicationRoles'
+     * @param bool      $reload_cache - force cache reload and get the fresh data from JIRA
+     *
+     * @return \stdClass
+     *
+     * @throws \Badoo\Jira\REST\Exception
+     */
+    public function getByKey(string $key, array $expand = [], bool $reload_cache = false) : \stdClass
+    {
+        $CachedUser = $this->getCached($key);
+        if (isset($CachedUser) && !$reload_cache) {
+            return $CachedUser;
+        }
+
+        $parameters = [
+            'key' => $key
+        ];
+
+        if (!empty($expand)) {
+            $parameters['expand'] = implode(',', $expand);
+        }
+
+        $UserInfo = $this->Jira->get('user', $parameters);
+        $this->cacheUser($UserInfo);
+        return $UserInfo;
+    }
+
+    /**
      * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/user-findUsers
      *
      * @param string    $pattern - user login, display name or email
