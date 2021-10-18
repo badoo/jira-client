@@ -328,15 +328,24 @@ class ClientRaw
         }
 
         $errors = array_merge(
-            (array)$ErrorResponse->errorMessages ?? [],
-            (array)$ErrorResponse->errors ?? []
+            (array)($ErrorResponse->errorMessages ?? []),
+            (array)($ErrorResponse->errors ?? [])
         );
 
         return "Jira REST API returned an error:\n\t" . implode("\n\t", $errors);
     }
 
+    /**
+     * @param array $response_info
+     * @param string $response_raw
+     * @param $response
+     *
+     * @throws \Badoo\Jira\REST\Exception
+     * @throws \Badoo\Jira\REST\Exception\Authorization
+     */
     protected function handleAPIError(array $response_info, string $response_raw, $response)
     {
+        $url          = $response_info['url'];
         $http_code    = $response_info['http_code'];
         $content_type = $response_info['content_type'];
 
@@ -345,19 +354,21 @@ class ClientRaw
 
         if ($http_code === 401 && $is_html) {
             throw new \Badoo\Jira\REST\Exception\Authorization(
-                "Jira API authorization failed, please check credentials"
+                "Jira API authorization failed for URL $url. Used '$this->login' user. Please check credentials"
             );
         }
 
         if ($http_code === 403 && $is_html) {
             throw new \Badoo\Jira\REST\Exception\Authorization(
-                "Access to the API method is forbidden. You either have not enough privileges or the capcha shown to your user"
+                "Access to the API method is forbidden. URL: $url. Used '$this->login' user. "
+                    . "You either have not enough privileges or the captcha shown to your user"
             );
         }
 
         if ($http_code >= 400 && !$is_json) {
             throw new \Badoo\Jira\REST\Exception(
-                "Jira REST API responded with code {$http_code} and content type {$content_type}. API answer: " . var_export($response_raw, 1)
+                "Jira REST API responded with code {$http_code} and content type {$content_type}. "
+                    . "URL: $url. API answer: " . var_export($response_raw, 1)
             );
         }
 
