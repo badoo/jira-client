@@ -136,17 +136,16 @@ class Configuration
 
     public function getJiraClient() : \Badoo\Jira\REST\Client
     {
-        $Jira = new \Badoo\Jira\REST\Client($this->getJiraURL());
-        $Jira->getRawClient()
-            ->setAuth(
-                $this->getJiraUser(),
-                $this->getJiraPassword()
-            )
+        $JiraRaw = new \Badoo\Jira\REST\ClientRaw($this->getJiraURL());
+        $JiraRaw->setAuth(
+            $this->getJiraUser(),
+            $this->getJiraPassword()
+        )
             ->setRequestTimeout(
                 $this->getJiraTimeout()
             );
 
-        return $Jira;
+        return new \Badoo\Jira\REST\Client($JiraRaw);
     }
 
     public function setGeneratorTargetDirectory(string $path) : Configuration
