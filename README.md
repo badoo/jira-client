@@ -44,6 +44,8 @@ $Jira = \Badoo\Jira\REST\Client::instance();
 $Jira
     ->setJiraUrl('https://jira.example.com/')
     ->setAuth('user', 'token/password');
+    // or via bearer token
+    ->setBearerToken('token');
 ```
 
 ## Create new issue
