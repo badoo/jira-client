@@ -47,7 +47,7 @@ class User
         \Badoo\Jira\Issue $Issue = null,
         \Badoo\Jira\REST\Client $Jira = null
     ) : User {
-        $Instance = new static($UserInfo->name, $Jira);
+        $Instance = new static($UserInfo->accountId, $Jira);
         $Instance->Issue = $Issue;
         $Instance->OriginalObject = $UserInfo;
 
