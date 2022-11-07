@@ -1,7 +1,7 @@
 {
-    "name": "badoo/jira-client",
+    "name": "sc0rp10/jira-client",
     "type": "library",
-    "description": "Jira REST API client with comfortable wrappers for most commonly used API instances like issues, custom fields, components and so on",
+    "description": "Jira REST API client with comfortable wrappers for most commonly used API instances like issues, custom fields, components and so on. Forked from badoo/jira-client",
     "version": "1.1.0",
     "minimum-stability": "stable",
     "license": "GPL-3.0-only",
