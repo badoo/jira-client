@@ -86,7 +86,7 @@ class Version extends Section
             $parameters['moveAffectedIssuesTo'] = $move_affected_to;
         }
 
-        $this->Jira->delete("/version/${id}", $parameters);
+        $this->Jira->delete("/version/{$id}", $parameters);
     }
 
     /**
@@ -112,7 +112,7 @@ class Version extends Section
             $parameters['after'] = $after;
         }
 
-        return $this->Jira->post("/version/${id}/move", $parameters);
+        return $this->Jira->post("/version/{$id}/move", $parameters);
     }
 
     /**
@@ -128,6 +128,6 @@ class Version extends Section
      */
     public function get(int $id) : \stdClass
     {
-        return $this->Jira->get("/version/${id}");
+        return $this->Jira->get("/version/{$id}");
     }
 }
