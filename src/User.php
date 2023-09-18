@@ -218,9 +218,36 @@ class User
         return "{$this->getDisplayName()} ({$this->getName()})";
     }
 
-    public function getKey() : string
+    /**
+     * Retrieves the account ID associated with the user, if it's a jira Cloud user.
+     *
+     * Returns an empty string if it's a Jira Server user.
+     *
+     * @link https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-user-get
+     *
+     * @return string The account ID for Jira Cloud users, or an empty string for Jira Server users.
+     *
+     * @throws REST\Exception If an error occurs during the API request.
+     */
+    public function getAccountId(): string
     {
-        return $this->getOriginalObject()->key;
+        return $this->getOriginalObject()->accountId ?? "";
+    }
+
+    /**
+     * Retrieves the user key associated with the user, if it's a Jira Server user.
+     *
+     * Returns an empty string if it's a Jira Cloud user.
+     *
+     * @link https://docs.atlassian.com/software/jira/docs/api/REST/9.7.2/#api/2/user-getUser
+     *
+     * @return string The user key for Jira Server users, or an empty string for Jira Cloud users.
+     *
+     * @throws REST\Exception If an error occurs during the API request.
+     */
+    public function getKey(): string
+    {
+        return $this->getOriginalObject()->key ?? "";
     }
 
     public function getName() : string
