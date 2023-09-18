@@ -219,15 +219,15 @@ class User
     }
 
     /**
-     * User account ID available for Jira Cloud API
+     * Retrieves the account ID associated with the user, if it's a jira Cloud user.
      *
-     * <b>Empty string for Jira Cloud API</b>
+     * Returns an empty string if it's a Jira Server user.
      *
      * @link https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-user-get
      *
-     * @return string
+     * @return string The account ID for Jira Cloud users, or an empty string for Jira Server users.
      *
-     * @throws REST\Exception
+     * @throws REST\Exception If an error occurs during the API request.
      */
     public function getAccountId(): string
     {
@@ -235,15 +235,15 @@ class User
     }
 
     /**
-     * User key available only for Jira Server API.
+     * Retrieves the user key associated with the user, if it's a Jira Server user.
      *
-     * <b>Empty string for Jira Cloud API</b>
+     * Returns an empty string if it's a Jira Cloud user.
      *
      * @link https://docs.atlassian.com/software/jira/docs/api/REST/9.7.2/#api/2/user-getUser
      *
-     * @return string
+     * @return string The user key for Jira Server users, or an empty string for Jira Cloud users.
      *
-     * @throws REST\Exception
+     * @throws REST\Exception If an error occurs during the API request.
      */
     public function getKey(): string
     {
