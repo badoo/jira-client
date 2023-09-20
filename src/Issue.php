@@ -37,6 +37,17 @@ class Issue
      */
     protected $update_fields = [];
 
+    /**
+     * @var array<string, mixed>
+     *
+     * @see getEditMeta()
+     *
+     * @link https://docs.atlassian.com/software/jira/docs/api/REST/9.7.2/#api/2/issue-getEditIssueMeta Server
+     *
+     * @link https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-editmeta-get Cloud
+     */
+    protected $editMeta = [];
+
     /*
      * External information sources
      */
@@ -302,6 +313,7 @@ class Issue
         $this->BaseIssue     = null;
         $this->custom_fields = [];
         $this->cached_data   = [];
+        $this->editMeta = [];
     }
 
     /**
@@ -363,6 +375,43 @@ class Issue
         }
 
         return $this->getBaseIssue($expand)->fields->{$field_id} ?? null;
+    }
+
+    /**
+     * @param array $editMeta result of {@link Issue::getEditMeta()}
+     *
+     * @return string|null field id on success or otherwise null
+     */
+    public function getFieldIdByName(array $editMeta, string $fieldName): ?string
+    {
+        foreach ($editMeta as $fieldId => $meta) {
+            if ($meta['name'] ?? "" === $fieldName) {
+                return $fieldId;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Get value of custom or system field, checking cache first
+     *
+     * IMPORTANT: cache is used for field-limited initialization, when issue was loaded from API with only selected
+     *            fields data instead of default 'all fields info'. Don't bypass it unless you know what you do.
+     *
+     * @param string $fieldName - custom field name (e.g. 'Build name' or 'Summary')
+     * @param string[] $expand - load extra information for issue before getting field value
+     *
+     * @return mixed null if there's no such field
+     *
+     * @throws \Badoo\Jira\REST\Exception
+     */
+    public function getFieldValueByName(string $fieldName, array $expand = [])
+    {
+        $fieldId = $this->getFieldIdByName($this->getEditMeta(), $fieldName);
+        if ($fieldId === null) {
+            return null;
+        }
+        return $this->getFieldValue($fieldId, $expand);
     }
 
     /**
@@ -432,13 +481,27 @@ class Issue
     }
 
     /**
-     * @return array
+     * Returns edit meta of the issue.
+     *
+     * The answer is cached by default. {@link Issue::dropCache() How to drop the cache}
+     *
+     * @return array<string,mixed>
      *
      * @throws \Badoo\Jira\REST\Exception
+     *
+     * @link https://docs.atlassian.com/software/jira/docs/api/REST/9.7.2/#api/2/issue-getEditIssueMeta Server
+     *
+     * @link https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issues/#api-rest-api-3-issue-issueidorkey-editmeta-get Cloud
+     *
      */
-    public function getEditMeta() : array
+    public function getEditMeta(): array
     {
-        return $this->Jira->issue()->getEditMeta($this->getKey());
+        if (!empty($this->editMeta)) {
+            return $this->editMeta;
+        }
+        $this->editMeta = $this->Jira->issue()->getEditMeta($this->getKey());
+
+        return $this->editMeta;
     }
 
     /**
