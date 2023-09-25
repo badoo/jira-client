@@ -14,13 +14,26 @@ class Section
     /** @var \Badoo\Jira\REST\Section\Section[] $sections */
     protected $sections = [];
 
+    /** @var bool $isCloudJira - for some sections it's important to know if we query cloud or server Jira */
+    protected $is_cloud_jira = false;
+
     /**
      * ASection constructor.
      * @param \Badoo\Jira\REST\ClientRaw $Jira
      */
-    public function __construct(\Badoo\Jira\REST\ClientRaw $Jira)
+    public function __construct(\Badoo\Jira\REST\ClientRaw $Jira, ?bool $is_cloud_jira = null)
     {
         $this->Jira = $Jira;
+        $this->is_cloud_jira = $is_cloud_jira;
+    }
+
+    protected function isCloudJira(): bool
+    {
+        if ($this->is_cloud_jira === null) {
+            $server_info = $this->Jira->get("/serverInfo");
+            $this->is_cloud_jira = ($server_info->deploymentType ?? '') === 'Cloud';
+        }
+        return $this->is_cloud_jira;
     }
 
     /**
@@ -36,7 +49,7 @@ class Section
     protected function getSection(string $section_key, string $section_class)
     {
         if (!isset($this->sections[$section_key])) {
-            $Section = new $section_class($this->Jira, $section_key);
+            $Section = new $section_class($this->Jira, $this->isCloudJira());
             $this->sections[$section_key] = $Section;
         }
 

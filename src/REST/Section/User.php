@@ -10,16 +10,25 @@ class User extends Section
 {
     protected $by_key = [];
     protected $by_name = [];
+    protected $by_account_id = [];
 
     protected function cacheUser(\stdClass $UserInfo)
     {
-        $this->by_key[$UserInfo->key]   = $UserInfo;
-        $this->by_name[$UserInfo->name] = $UserInfo;
+        if ($this->isCloudJira()) {
+            $this->by_account_id[$UserInfo->accountId] = $UserInfo;
+        } else {
+            $this->by_key[$UserInfo->key] = $UserInfo;
+            $this->by_name[$UserInfo->name] = $UserInfo;
+        }
     }
 
     protected function getCached(string $key) : ?\stdClass
     {
-        return $this->by_key[$key] ?? $this->by_name[$key] ?? null;
+        if ($this->isCloudJira()) {
+            return $this->by_account_id[$key] ?? null;
+        } else {
+            return $this->by_key[$key] ?? $this->by_name[$key] ?? null;
+        }
     }
 
     protected function dropCached(string $key)
@@ -29,8 +38,12 @@ class User extends Section
             return;
         }
 
-        unset($this->by_key[$CachedUser->key]);
-        unset($this->by_name[$CachedUser->name]);
+        if ($this->isCloudJira()) {
+            unset($this->by_account_id[$CachedUser->accountId]);
+        } else {
+            unset($this->by_key[$CachedUser->key]);
+            unset($this->by_name[$CachedUser->name]);
+        }
     }
 
     /**
@@ -163,6 +176,42 @@ class User extends Section
     }
 
     /**
+     * Get existing user info by account id.
+     *
+     * Method is only available for the Cloud Jira API.
+     *
+     * @see https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-users/#api-rest-api-3-user-get
+     *
+     * @param string    $account_id
+     * @param string[]  $expand - provide additional fields information in response
+     *                              E.g.: 'groups', 'applicationRoles'
+     * @param bool      $reload_cache - force cache reload and get the fresh data from JIRA
+     *
+     * @return \stdClass
+     *
+     * @throws \Badoo\Jira\REST\Exception
+     */
+    public function getById(string $account_id, array $expand = [], bool $reload_cache = false): \stdClass
+    {
+        $CachedUser = $this->getCached($account_id);
+        if (isset($CachedUser) && !$reload_cache) {
+            return $CachedUser;
+        }
+
+        $parameters = [
+            'accountId' => $account_id,
+        ];
+
+        if (!empty($expand)) {
+            $parameters['expand'] = implode(',', $expand);
+        }
+
+        $UserInfo = $this->Jira->get('user', $parameters);
+        $this->cacheUser($UserInfo);
+        return $UserInfo;
+    }
+
+    /**
      * Get existing user info by user key
      *
      * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/user-getUser
@@ -217,15 +266,23 @@ class User extends Section
         bool $include_active = true,
         bool $include_inactive = false
     ) : array {
+
+        $request_data = [
+            'startAt'         => $start_at,
+            'maxResults'      => $max_results,
+            'includeActive'   => $include_active ? 'true' : 'false',
+            'includeInactive' => $include_inactive ? 'true' : 'false',
+        ];
+
+        if ($this->is_cloud_jira) {
+            $request_data['query'] = $pattern;
+        } else {
+            $request_data['username'] = $pattern;
+        }
+
         $users = $this->Jira->get(
             'user/search',
-            [
-                'username'        => $pattern,
-                'startAt'         => $start_at,
-                'maxResults'      => $max_results,
-                'includeActive'   => $include_active ? 'true' : 'false',
-                'includeInactive' => $include_inactive ? 'true' : 'false',
-            ]
+            $request_data
         );
 
         foreach ($users as $UserInfo) {
