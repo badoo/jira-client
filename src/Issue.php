@@ -6,6 +6,9 @@
 
 namespace Badoo\Jira;
 
+use Badoo\Jira\REST\Exception;
+use http\Exception\RuntimeException;
+
 /**
  * Class Issue
  *
@@ -377,12 +380,45 @@ class Issue
         return $this->getBaseIssue($expand)->fields->{$field_id} ?? null;
     }
 
+
+    /**
+     * Returns fields id for any known field in the issue
+     *
+     * @param $fieldName string name of field, e.g. 'Created', 'Summary', 'Build name' and so on
+     *
+     * @return string empty string for unknown field
+     */
+    public function getFieldId(string $fieldName): string
+    {
+        $names = $this->BaseIssue->names??[];
+        if (empty($names)) {
+            return "";
+        }
+        foreach ($names as $fieldId => $name) {
+            if ($name == $fieldName) {
+                return $fieldId;
+            }
+        }
+        return "";
+    }
+
+    /**
+     * @deprecated use {@link getEditableFieldIdByName getEditableFieldIdByName} instead
+     * @param array $editMeta
+     * @param string $fieldName
+     * @return string|null
+     */
+    public function getFieldIdByName(array $editMeta, string $fieldName): ?string
+    {
+        return $this->getEditableFieldIdByName($editMeta, $fieldName);
+    }
+
     /**
      * @param array $editMeta result of {@link Issue::getEditMeta()}
      *
      * @return string|null field id on success or otherwise null
      */
-    public function getFieldIdByName(array $editMeta, string $fieldName): ?string
+    public function getEditableFieldIdByName(array $editMeta, string $fieldName): ?string
     {
         foreach ($editMeta as $fieldId => $meta) {
             if ($meta['name'] ?? "" === $fieldName) {
@@ -407,8 +443,8 @@ class Issue
      */
     public function getFieldValueByName(string $fieldName, array $expand = [])
     {
-        $fieldId = $this->getFieldIdByName($this->getEditMeta(), $fieldName);
-        if ($fieldId === null) {
+        $fieldId = $this->getFieldId($fieldName);
+        if ($fieldId === '') {
             return null;
         }
         return $this->getFieldValue($fieldId, $expand);
@@ -419,29 +455,39 @@ class Issue
      * This is useful e.g. for text fields with formatters (e.g. wiki-), to get the same layout as in issue view page
      * without tricks and hacks.
      *
-     * @param string $field_id - ID of field to get (e.g. 'customfield_12345' or 'summary')
+     * @param string $fieldName ID of name of field to get (e.g. 'customfield_12345' or 'Summary')
      *
-     * @return string|null - null when no field with such ID found for issue.
+     * @return string|null - null when no field with such name or ID found for issue.
      *
      * @throws \Badoo\Jira\REST\Exception
      */
-    public function getRenderedField(string $field_id) : ?string
+    public function getRenderedField(string $fieldName): ?string
     {
-        return $this->getBaseIssue([\Badoo\Jira\REST\Section\Issue::EXP_RENDERED_FIELDS])->renderedFields->{$field_id} ?? null;
+        $fieldId = $this->getFieldId($fieldName);
+        if ($fieldId === '') {
+            return null;
+        }
+        return $this->getBaseIssue([\Badoo\Jira\REST\Section\Issue::EXP_RENDERED_FIELDS])
+            ->renderedFields
+            ->{$fieldId} ?? null;
     }
 
     /**
      * Get date/time field value as UNIX timestamp. strtotime() is used to parse the value of the field.
      *
-     * @param string $field_id - ID of field to parse, e.g. 'created', 'updated' and so on
+     * @param string $fieldName ID of name of field to parse, e.g. 'Created', 'updated', "customfield_12345" and so on
      * @param array $expand
      * @return int
      * @throws \Badoo\Jira\REST\Exception
      * @throws \Badoo\Jira\Exception\Issue
      */
-    public function getDateField(string $field_id, array $expand = []) : int
+    public function getDateField(string $fieldName, array $expand = []): int
     {
-        $time = $this->getFieldValue($field_id, $expand);
+        $fieldId = $this->getFieldId($fieldName);
+        if ($fieldId === '') {
+            throw new RuntimeException("Can't get field id for '$fieldName'");
+        }
+        $time = $this->getFieldValue($fieldId, $expand);
 
         if (empty($time)) {
             return 0;
@@ -452,12 +498,17 @@ class Issue
 
             if ($ts === false) {
                 throw new \Badoo\Jira\Exception\Issue(
-                    "Can't parse '{$field_id}' field value as time string, strtotime('{$time}') returned 'false'"
+                    sprintf(
+                        "Can't parse '%s(%s)' field value as time string, strtotime('%s') returned 'false'",
+                        $fieldName,
+                        $fieldId,
+                        $time
+                    )
                 );
             }
 
             $time = $ts;
-            $this->cacheData($field_id, $ts);
+            $this->cacheData($fieldId, $ts);
         }
 
         return $time;
@@ -505,32 +556,37 @@ class Issue
     }
 
     /**
-     * @param string $field_id - ID of system (e.g. 'description') or custom (e.g. customfield_12345) field you want
-     *                           to check
+     * @param string $fieldName ID or name of system (e.g. 'description' or 'Reviewer')
+     *                          or custom (e.g. customfield_12345) field
+     *                          you want to check
      *
      * @return bool - true means you can update this issue field's value
      *
      * @throws \Badoo\Jira\REST\Exception
      */
-    public function isEditable(string $field_id) : bool
+    public function isEditable(string $fieldName): bool
     {
-        return isset($this->getEditMeta()[$field_id]);
+        $fieldId = $this->getEditableFieldIdByName($this->getEditMeta(), $fieldName);
+        return isset($this->getEditMeta()[$fieldId]);
     }
 
     /**
      * Edit issue fields
      * NOTE: the changes are actually applied only after ->save() call.
      *
-     * @param string $field_id - ID of field to update. E.g. 'summary' or 'customfield_12345'
+     * @param string $fieldName ID or name of field to update. E.g. 'Review' or 'customfield_12345'
      * @param array $update - update request
      *                          Example: [ [ 'set' => [ 'id' => 1234' ] ]
-     *                        @see \Badoo\Jira\REST\Section\Issue::edit DocBlock for more info
-     *
      * @return $this
+     *
+     * @throws Exception
+     *
+     * @see \Badoo\Jira\REST\Section\Issue::edit DocBlock for more info
      */
-    public function edit(string $field_id, array $update) : \Badoo\Jira\Issue
+    public function edit(string $fieldName, array $update): \Badoo\Jira\Issue
     {
-        $this->update_fields[$field_id] = $update;
+        $fieldId = $this->getEditableFieldIdByName($this->getEditMeta(), $fieldName);
+        $this->update_fields[$fieldId] = $update;
         return $this;
     }
 
