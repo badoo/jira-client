@@ -10,6 +10,9 @@ if (!empty($namespace)) {
 
 class <?= $class_name ?> extends \Badoo\Jira\CustomFields\SelectField
 {
+    /**
+     * @deprecated use {@link getID getID} instead
+     */
     const ID    = '<?= $field_id ?>';
     const NAME  = '<?= $field_name ?>';
 

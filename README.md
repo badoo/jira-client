@@ -515,7 +515,7 @@ they differ in API requests required for initialization and values update.
 $MyCustomField = \Example\CustomFields\MyJIRACustomField::forIssue('SMPL-1');
 
 // The example above is equivalent to:
-$Issue = \Badoo\Jira\Issue::byKey('SMPL-1', ['key', \Example\CustomFields\MyJIRACustomField::ID]);
+$Issue = \Badoo\Jira\Issue::byKey('SMPL-1', ['key']);
 $MyCustomField = new \Example\CustomFields\MyJIRACustomField($Issue);
 ```
 

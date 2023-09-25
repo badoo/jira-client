@@ -29,6 +29,23 @@ class IssueTest extends \PHPUnit\Framework\TestCase
 
         $IssueMock = $IssueMockBuilder->getMock();
         $IssueMock->method('getBaseIssue')->willReturn($BaseIssue);
+        $IssueMock->method('getEditMeta')->willReturn([
+            "fields" => [
+                "created" => [
+                    "required" => false,
+                    "schema" => [
+                        "type" => "datetime",
+                        "custom" => "com.atlassian.jira.plugin.system.customfieldtypes:datetime",
+                        "customId" => 10460
+                    ],
+                    "name" => "Created date",
+                    "fieldId" => "created",
+                    "operations" => [
+                        "set"
+                    ]
+                ]
+            ]
+        ]);
 
         /** @var \Badoo\Jira\Issue $IssueMock */
         return $IssueMock;

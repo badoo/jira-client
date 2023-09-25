@@ -78,9 +78,9 @@ class Issue extends Section
         if (!empty($fields)) {
             $args['fields'] = implode(',', $fields);
         }
-        if (!empty($expand)) {
-            $args['expand'] = implode(',', $expand);
-        }
+
+        $args['expand'] = implode(',', array_unique(array_merge($expand, ["names"])));
+
         if (!empty($properties)) {
             $args['properties'] = $properties;
         }
@@ -124,9 +124,8 @@ class Issue extends Section
         if (!empty($fields)) {
             $args['fields'] = $fields;
         }
-        if (!empty($expand)) {
-            $args['expand'] = $expand;
-        }
+
+        $args['expand'] = array_unique(array_merge($expand, ["names"]));
 
         $result = $this->Jira->post('/search', $args);
         return $result->issues;

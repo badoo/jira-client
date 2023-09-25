@@ -6,6 +6,8 @@
 
 namespace Badoo\Jira\CustomFields;
 
+use Badoo\Jira\REST\Exception;
+
 /**
  * Class CustomField
  * @package Badoo\Jira\CustomFields
@@ -27,7 +29,7 @@ abstract class CustomField
     protected $Issue;
 
     /**
-     * @param string $issue_key
+     * @param string $issueKey
      * @param \Badoo\Jira\REST\Client|null $Jira
      *
      * @return static
@@ -35,12 +37,15 @@ abstract class CustomField
      * @throws \Badoo\Jira\Exception\Issue
      * @throws \Badoo\Jira\REST\Exception
      */
-    public static function forIssue(string $issue_key, \Badoo\Jira\REST\Client $Jira = null) : CustomField
+    public static function forIssue(string $issueKey, \Badoo\Jira\REST\Client $Jira = null): CustomField
     {
-        $Issue = \Badoo\Jira\Issue::byKey($issue_key, ['key', static::ID], [], $Jira);
+        $Issue = \Badoo\Jira\Issue::byKey($issueKey, [], [], $Jira);
         return $Issue->getCustomField(static::class);
     }
 
+    /**
+     * @throws Exception
+     */
     public function __construct(\Badoo\Jira\Issue $Issue)
     {
         $this->Issue = $Issue;
@@ -106,9 +111,9 @@ abstract class CustomField
     /**
      * Custom field's unique ID used in REST API responses and requests (e.g. customfield_<number>)
      */
-    public function getID() : string
+    public function getID(): string
     {
-        return static::ID;
+        return $this->Issue->getFieldId($this->getName());
     }
 
     /**
