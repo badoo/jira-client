@@ -382,15 +382,15 @@ class Issue
 
 
     /**
-     * Returns fields id for any known field in the issue
+     * Retrieves the ID of a field by its name if the field exists in the issue.
      *
-     * @param $fieldName string name of field, e.g. 'Created', 'Summary', 'Build name' and so on
+     * @param string $fieldName The name of the field, e.g., 'Created,' 'Summary,' 'Build name,' and so on.
      *
-     * @return string empty string for unknown field
+     * @return string The field ID, or an empty string if the field name is unknown.
      */
     public function getFieldId(string $fieldName): string
     {
-        $names = $this->BaseIssue->names??[];
+        $names = $this->BaseIssue->names ?? [];
         if (empty($names)) {
             return "";
         }
@@ -405,7 +405,6 @@ class Issue
     /**
      * @deprecated use {@link getEditableFieldIdByName getEditableFieldIdByName} instead
      * @param array $editMeta
-     * @param string $fieldName
      * @return string|null
      */
     public function getFieldIdByName(array $editMeta, string $fieldName): ?string
@@ -455,7 +454,7 @@ class Issue
      * This is useful e.g. for text fields with formatters (e.g. wiki-), to get the same layout as in issue view page
      * without tricks and hacks.
      *
-     * @param string $fieldName ID of name of field to get (e.g. 'customfield_12345' or 'Summary')
+     * @param string $fieldName Field ID or name (e.g., 'customfield_12345' or 'Summary')
      *
      * @return string|null - null when no field with such name or ID found for issue.
      *
@@ -475,7 +474,7 @@ class Issue
     /**
      * Get date/time field value as UNIX timestamp. strtotime() is used to parse the value of the field.
      *
-     * @param string $fieldName ID of name of field to parse, e.g. 'Created', 'updated', "customfield_12345" and so on
+     * @param string $fieldName ID or name of the field to parse (e.g. 'Created', 'updated', "customfield_12345" and so on).
      * @param array $expand
      * @return int
      * @throws \Badoo\Jira\REST\Exception

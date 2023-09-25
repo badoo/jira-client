@@ -79,7 +79,7 @@ class Issue extends Section
             $args['fields'] = implode(',', $fields);
         }
 
-        $args['expand'] = implode(',', array_unique(array_merge($expand + ["names"])));
+        $args['expand'] = implode(',', array_unique(array_merge($expand, ["names"])));
 
         if (!empty($properties)) {
             $args['properties'] = $properties;
@@ -125,7 +125,7 @@ class Issue extends Section
             $args['fields'] = $fields;
         }
 
-        $args['expand'] = array_unique(array_merge($expand + ["names"]));
+        $args['expand'] = array_unique(array_merge($expand, ["names"]));
 
         $result = $this->Jira->post('/search', $args);
         return $result->issues;
