@@ -47,7 +47,7 @@ class User
         \Badoo\Jira\Issue $Issue = null,
         \Badoo\Jira\REST\Client $Jira = null
     ) : User {
-        $Instance = new static($UserInfo->name, $Jira);
+        $Instance = new static($UserInfo->name ?? '', $Jira);
         $Instance->Issue = $Issue;
         $Instance->OriginalObject = $UserInfo;
 
@@ -55,7 +55,9 @@ class User
     }
 
     /**
-     * Get user from API by ID.
+     * Get user from API by username.
+     *
+     * Please note that this method is not available when working with the Cloud Jira API.
      *
      * This method makes an API request immediately, while
      *     $User = new User(<name>, <Client>);
@@ -74,6 +76,25 @@ class User
         $Instance->getOriginalObject();
 
         return $Instance;
+    }
+
+    /**
+     * Get user by account ID.
+     *
+     * Please note that this method will only work if you work with the Cloud Jira API.
+     *
+     * @param string $account_id
+     * @param REST\Client|null $Jira
+     * @return User
+     */
+    public static function byId(string $account_id, \Badoo\Jira\REST\Client $Jira = null): User
+    {
+        if (!isset($Jira)) {
+            $Jira = \Badoo\Jira\REST\Client::instance();
+        }
+
+        $userInfo = $Jira->user()->getById($account_id);
+        return static::fromStdClass($userInfo, null, $Jira);
     }
 
     /**
@@ -178,7 +199,7 @@ class User
      *                                        Enables you to access several JIRA instances from one piece of code,
      *                                        or use different users for different actions.
      */
-    public function __construct(string $name, \Badoo\Jira\REST\Client $Jira = null)
+    public function __construct(string $name = '', \Badoo\Jira\REST\Client $Jira = null)
     {
         if (!isset($Jira)) {
             $Jira = \Badoo\Jira\REST\Client::instance();
@@ -252,7 +273,7 @@ class User
 
     public function getName() : string
     {
-        return $this->name;
+        return $this->getOriginalObject()->name ?? '';
     }
 
     public function getDisplayName() : string
