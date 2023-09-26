@@ -385,7 +385,7 @@ class Issue
     public function getFieldIdByName(array $editMeta, string $fieldName): ?string
     {
         foreach ($editMeta as $fieldId => $meta) {
-            if ($meta['name'] ?? "" === $fieldName) {
+            if (in_array($fieldName, [$meta->name ?? "", $meta->key ?? ""], true)) {
                 return $fieldId;
             }
         }
