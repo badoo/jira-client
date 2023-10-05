@@ -70,6 +70,16 @@ class Client extends \Badoo\Jira\REST\Section\Section
     }
 
     /**
+     * @param string $token
+     * @return static
+     */
+    public function setBearerToken(string $token) : Client
+    {
+        $this->getRawClient()->setBearerToken($token);
+        return $this;
+    }
+
+    /**
      * @return \Badoo\Jira\REST\Section\Jql
      */
     public function jql() : \Badoo\Jira\REST\Section\Jql

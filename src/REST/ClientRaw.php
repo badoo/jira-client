@@ -35,6 +35,8 @@ class ClientRaw
     private $login = '';
     /** @var string - login's authentication secret. It can be API token (good) or bare user password (deprecated) */
     private $secret = '';
+    /** @var string a bearer token. It can be Personal Access Token or OAuth Access Token.*/
+    private $bearerToken = '';
 
     protected $request_timeout = 60;
 
@@ -70,6 +72,19 @@ class ClientRaw
     {
         $this->login    = $login;
         $this->secret   = $secret;
+
+        return $this;
+    }
+
+    /**
+     * Set a bearer token to use in the Authorization header of a REST API call.
+     *
+     * @param string $token bearer token
+     * @return ClientRaw
+     */
+    public function setBearerToken(string $token) : ClientRaw
+    {
+        $this->bearerToken = $token;
 
         return $this;
     }
@@ -226,7 +241,6 @@ class ClientRaw
         }
 
         $curl_options = [
-            CURLOPT_USERPWD        => $this->login . ':' . $this->secret,
             CURLOPT_URL            => $url,
             CURLOPT_TIMEOUT        => $this->request_timeout,
             CURLOPT_RETURNTRANSFER => true,
@@ -238,6 +252,12 @@ class ClientRaw
             'Accept'            => 'application/json',
             'Content-Type'      => 'application/json',
         ];
+
+        if (strlen($this->bearerToken) > 0) {
+            $header_options['Authorization'] = 'Bearer ' . $this->bearerToken;
+        } else {
+            $curl_options[CURLOPT_USERPWD] = $this->login . ':' . $this->secret;
+        }
 
         switch ($http_method) {
             case self::REQ_POST:
