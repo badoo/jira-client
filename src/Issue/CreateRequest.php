@@ -26,6 +26,18 @@ namespace Badoo\Jira\Issue;
  */
 class CreateRequest
 {
+    /**
+     * Jira REST API accepts a non-standard format similar to ISO 8601.
+     *
+     * The differences are that Jira requires the following:
+     * 1. Fractional seconds, e.g. ".00" or ".000" after the seconds.
+     * 2. Timezone format without a colon, e.g. "+0000".
+     *
+     * @example 2018-03-04T23:44:57.00+0000
+     * @see https://jira.atlassian.com/browse/JRASERVER-61378
+     */
+    private const JIRA_DATE_TIME_FORMAT = 'Y-m-d\TH:i:s.00O';
+
     /** @var \Badoo\Jira\REST\Client */
     protected $Jira;
 
@@ -437,6 +449,16 @@ class CreateRequest
     public function setDueDate($ts) : CreateRequest
     {
         return $this->setDateField('Due Date', $ts);
+    }
+
+    /**
+     * @param string $field Field name.
+     * @param int $timestamp Unix timestamp, in seconds.
+     * @return $this
+     */
+    public function setDateTimeField(string $field, int $timestamp): self
+    {
+        return $this->setFieldValue($field, date(self::JIRA_DATE_TIME_FORMAT, $timestamp));
     }
 
     /**
