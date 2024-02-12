@@ -21,8 +21,8 @@
         "bin/generate"
     ],
     "require": {
-        "symfony/yaml": "^6.1",
-        "psr/log": "^3.0"
+        "symfony/yaml": "6.*|7.*|8.*|9.*",
+        "psr/log": "*"
     },
     "autoload": {
         "psr-4": {
