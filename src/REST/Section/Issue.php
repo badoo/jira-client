@@ -19,8 +19,58 @@ class Issue extends Section
         EXP_RENDERED_FIELDS = 'renderedFields',
         EXP_CREATEMETA_FIELDS = 'projects.issuetypes.fields';
 
+    public const SEARCH_MAX_RESULTS = 100;
+
     /** @var array */
     protected $edit_meta = [];
+
+    /**
+     * Cloud -> enhanced; Server/DC -> legacy;
+     * enhanced fallback to legacy if unavailable.
+     */
+    public const SEARCH_MODE_AUTO     = 'auto';
+    /** Always use /search/jql (Cloud-only). */
+    public const SEARCH_MODE_ENHANCED = 'enhanced';
+    /** Always use /search. */
+    public const SEARCH_MODE_LEGACY   = 'legacy';
+
+    private const VALID_SEARCH_MODES = [
+        self::SEARCH_MODE_AUTO,
+        self::SEARCH_MODE_ENHANCED,
+        self::SEARCH_MODE_LEGACY,
+    ];
+
+    /**
+     * @var string Search mode (one of SEARCH_MODE_* constants)
+     */
+    private string $search_mode = self::SEARCH_MODE_AUTO;
+
+    /**
+     * Select search mode. Defaults to self::SEARCH_MODE_AUTO.
+     *
+     * @param string $mode One of SEARCH_MODE_* constants
+     *
+     * @throws \InvalidArgumentException if invalid mode provided.
+     */
+    public function setSearchMode(string $mode) : self
+    {
+        $mode = strtolower($mode);
+        if (!in_array($mode, self::VALID_SEARCH_MODES, true)) {
+            throw new \InvalidArgumentException("Invalid search mode '{$mode}'");
+        }
+        $this->search_mode = $mode;
+        return $this;
+    }
+
+    /**
+     * Get current search mode.
+     *
+     * @return string One of SEARCH_MODE_* constants
+     */
+    public function getSearchMode() : string
+    {
+        return $this->search_mode;
+    }
 
     /**
      * Get interface for operations with issue comments
@@ -95,6 +145,7 @@ class Issue extends Section
      *  - it has much higher max_results default value
      *  - it always validates your query, you can't disable it
      *
+     * @see https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/#api-rest-api-3-search-jql-post
      * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/search-search
      *
      * @param string    $jql
@@ -114,22 +165,214 @@ class Issue extends Section
         int $max_results = 1000,
         int $start_at = 0
     ) : array {
+        $mode = $this->getSearchMode();
+
+        if ($mode === self::SEARCH_MODE_ENHANCED) {
+            return $this->searchEnhanced($jql, $fields, $expand, $max_results, $start_at);
+        }
+
+        if ($mode === self::SEARCH_MODE_LEGACY) {
+            @trigger_error(
+                'Legacy /search path is deprecated on Jira Cloud and may be removed in a future major vesion.',
+                E_USER_DEPRECATED,
+            );
+            return $this->searchLegacy($jql, $fields, $expand, $max_results, $start_at);
+        }
+
+        // Auto.
+        if ($this->isCloudJira()) {
+            try {
+                return $this->searchEnhanced($jql, $fields, $expand, $max_results, $start_at);
+            } catch (\Badoo\Jira\REST\Exception $e) {
+                $msg = (string)$e->getMessage();
+                // Fallback to legacy if enhanced endpoint is unavailable (e.g. old Jira Server/DC).
+                if (
+                    strpos($msg, '#CHANGE-2046') !== false ||
+                    in_array((int)$e->getCode(), [404, 410], true)
+                ) {
+                    @trigger_error(
+                        'Falling back to legacy /search path on Jira Cloud. ' .
+                            'This may be removed in a future major vesion.',
+                        E_USER_DEPRECATED,
+                    );
+                    return $this->searchLegacy($jql, $fields, $expand, $max_results, $start_at);
+                }
+                throw $e; // Geniune error (e.g., bad JQL)
+            }
+        }
+
+        // Server/DC
+        return $this->searchLegacy($jql, $fields, $expand, $max_results, $start_at);
+    }
+
+    /**
+     * @deprecated Will be removed for Jira Cloud in the next major version; kept for Server/DC.
+     * @internal
+     *
+     * Search for issues using
+     * This method is the same to Client->search() one with some differencies:
+     *  - it returns the list of issues from 'issues' response field.
+     *  - it has much higher max_results default value
+     *  - it always validates your query, you can't disable it
+     *
+     * @see https://docs.atlassian.com/software/jira/docs/api/REST/7.6.1/#api/2/search-search
+     *
+     * @param string    $jql
+     * @param string[]  $fields
+     * @param string[]  $expand
+     * @param int       $max_results
+     * @param int       $start_at
+     *
+     * @return \stdClass[] - list of issues
+     *
+     * @throws \Badoo\Jira\REST\Exception
+     */
+    protected function searchLegacy(
+        string $jql,
+        $fields = [],
+        $expand = [],
+        int $max_results = 1000,
+        int $start_at = 0
+    ) : array {
+        $fields = (array)$fields;
+        $expand = array_unique(array_merge((array)$expand, ['names']));
         $args = [
             'jql'           => $jql,
-            'startAt'       => $start_at,
-            'maxResults'    => $max_results,
-            'validateQuery' => true,
+            'validateQuery' => true, // allowed on legacy
         ];
-
         if (!empty($fields)) {
             $args['fields'] = $fields;
         }
-        if (!empty($expand)) {
-            $args['expand'] = $expand;
+        $args['expand'] = $expand; // legacy still tolerates array here
+
+        $issues = [];
+        $limit  = min(self::SEARCH_MAX_RESULTS, $max_results);
+        $offset = max(0, $start_at);
+
+        while (count($issues) < $max_results) {
+            $args['startAt']    = $offset;
+            $args['maxResults'] = min($limit, $max_results - count($issues));
+
+            $result = $this->Jira->post('/search', $args);
+
+            if (isset($result->maxResults) && $result->maxResults < $limit) {
+                $limit = $result->maxResults;
+            }
+
+            if (($result->names ?? null) !== null) {
+                foreach ($result->issues as $i => $_) {
+                    $result->issues[$i]->names = $result->names;
+                }
+            }
+
+            $offset += $limit;
+            $issues = array_merge($issues, $result->issues ?? []);
+
+            if (empty($result->issues) || count($result->issues) < $limit) {
+                break;
+            }
         }
 
-        $result = $this->Jira->post('/search', $args);
-        return $result->issues;
+        return $issues;
+    }
+
+    /**
+     * Search for issues using JQL (Cloud-only enhanced endpoint).
+     *
+     * @internal
+     *
+     * @see https://developer.atlassian.com/cloud/jira/platform/rest/v3/api-group-issue-search/#api-rest-api-3-search-jql-post
+     *
+     * @param string    $jql
+     * @param string[]  $fields
+     * @param string[]  $expand
+     * @param int       $max_results
+     * @param int       $start_at
+     *
+     * @return \stdClass[] - list of issues
+     *
+     * @throws \Badoo\Jira\REST\Exception
+     */
+    protected function searchEnhanced(
+        string $jql,
+        array $fields = [],
+        array $expand = [],
+        int $max_results = 1000,
+        int $start_at = 0
+    ) : array {
+        $fields = (array)$fields;
+        $expand = array_unique(array_merge((array)$expand, ['names']));
+
+        // Backward compatibility with the legacy API: return all navigable fields by default.
+        if (empty($fields)) {
+            $fields = ['*navigable'];
+        }
+        $args = [
+            'jql'          => $jql,
+            'fieldsByKeys' => true,
+        ];
+        if (!empty($fields)) {
+            $args['fields'] = $fields; // array of strings
+        }
+        if (!empty($expand)) {
+            $args['expand'] = implode(',', $expand); // comma-delimited per docs
+        }
+
+        $issues       = [];
+        $remaining    = max(0, $max_results);
+        $toSkip       = max(0, $start_at); // emulate startAt by skipping locally
+        $pageSize     = min(self::SEARCH_MAX_RESULTS, max(1, $remaining));
+        $nextPageToken = null;
+
+        while ($remaining > 0) {
+            // Ask for enough items to cover any local skip
+            $args['maxResults'] = min($pageSize, $remaining + $toSkip);
+
+            if ($nextPageToken) {
+                $args['nextPageToken'] = $nextPageToken;
+            } else {
+                unset($args['nextPageToken']);
+            }
+
+            $result = $this->Jira->post('/search/jql', $args);
+
+            $batch = $result->issues ?? [];
+
+            // Attach names map like the legacy flow
+            if (isset($result->names)) {
+                foreach ($batch as $i => $_) {
+                    $batch[$i]->names = $result->names;
+                }
+            }
+
+            // Emulate start_at by skipping from the first page(s)
+            if ($toSkip > 0 && !empty($batch)) {
+                $skipNow = min($toSkip, count($batch));
+                $batch   = array_slice($batch, $skipNow);
+                $toSkip -= $skipNow;
+            }
+
+            foreach ($batch as $issue) {
+                if ($remaining <= 0) {
+                    break;
+                }
+                $issues[] = $issue;
+                $remaining--;
+            }
+
+            // Prepare next page (cursor-based)
+            $nextPageToken = $result->nextPageToken ?? null;
+            if (empty($nextPageToken) || $remaining <= 0) {
+                break;
+            }
+
+            // Defensively adapt page size if API clamps it
+            if (isset($result->maxResults) && is_numeric($result->maxResults)) {
+                $pageSize = max(1, (int)$result->maxResults);
+            }
+        }
+
+        return $issues;
     }
 
     /**
