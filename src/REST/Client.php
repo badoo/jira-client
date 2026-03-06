@@ -63,7 +63,7 @@ class Client extends \Badoo\Jira\REST\Section\Section
      * @param string $secret
      * @return static
      */
-    public function setAuth(string $login, string $secret) : Client
+    public function setAuth(string $login, #[\SensitiveParameter] string $secret) : Client
     {
         $this->getRawClient()->setAuth($login, $secret);
         return $this;
