@@ -63,7 +63,7 @@ class User extends Section
      */
     public function create(
         string $name,
-        string $password,
+        #[\SensitiveParameter] string $password,
         string $email,
         string $display_name,
         array $applications = ["jira-software"]
