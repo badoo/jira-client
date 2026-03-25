@@ -66,7 +66,7 @@ class ClientRaw
      *
      * @return ClientRaw
      */
-    public function setAuth(string $login, string $secret) : ClientRaw
+    public function setAuth(string $login, #[\SensitiveParameter] string $secret) : ClientRaw
     {
         $this->login    = $login;
         $this->secret   = $secret;
